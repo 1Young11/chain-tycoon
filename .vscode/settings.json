@@ -1,0 +1,13 @@
+{
+  "cssvar.files": ["./src/styles/variables.scss"],
+  "cssvar.extensions": ["vue", "scss"],
+   "editor.quickSuggestions": {
+    "other": true,
+    "comments": false,
+    "strings": true
+  },
+  "editor.quickSuggestionsDelay": 0,
+  "editor.suggest.delay": 0,
+  "css.validate": false,
+  "scss.validate": false
+}

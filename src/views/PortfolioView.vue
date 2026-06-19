@@ -1,0 +1,8 @@
+<script setup lang="ts">
+</script>
+
+<template>
+  <div class="view">
+    <h1>PortfolioView</h1>
+  </div>
+</template>

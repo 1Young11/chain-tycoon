@@ -1,0 +1,37 @@
+// Брейкпоинты
+@mixin md {
+   @media (min-width: 768px) {
+      @content;
+   }
+}
+@mixin lg {
+   @media (min-width: 1024px) {
+      @content;
+   }
+}
+@mixin xl {
+   @media (min-width: 1280px) {
+      @content;
+   }
+}
+
+// Обрезка текста
+@mixin truncate {
+   overflow: hidden;
+   text-overflow: ellipsis;
+   white-space: nowrap;
+}
+
+// Flex центрирование
+@mixin flex-center {
+   display: flex;
+   align-items: center;
+   justify-content: center;
+}
+
+// Glassmorphism карточка
+@mixin glass {
+   background: rgba(255, 255, 255, 0.04);
+   border: 1px solid rgba(255, 255, 255, 0.08);
+   backdrop-filter: blur(20px);
+}
