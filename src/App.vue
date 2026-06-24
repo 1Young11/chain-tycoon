@@ -2,13 +2,13 @@
 </script>
 
 <template>
-  <div id="app">
-    <RouterView />
-  </div>
+   <div id="app">
+      <RouterView />
+   </div>
 </template>
 
 <style scoped>
 #app {
-  min-height: 100vh;
+   min-height: 100vh;
 }
 </style>

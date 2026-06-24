@@ -7,25 +7,27 @@ export const routes: RouteRecordRaw[] = [
       component: () => import('@/components/layout/PublicLayout.vue'),
       children: [
          {
-            path: '',
-            redirect: '/app/dashboard', // ← сюда
-         },
-         {
-            path: 'landing',           // ← лендинг переехал на /landing
-            name: 'landing',
-            component: () => import('@/views/LandingView.vue'),
-         },
-         {
-            path: 'login',
-            name: 'login',
-            component: () => import('@/views/LoginView.vue'),
-            meta: { guestOnly: true },
-         },
-         {
-            path: 'register',
-            name: 'register',
-            component: () => import('@/views/RegisterView.vue'),
-            meta: { guestOnly: true },
+            path: '/',
+            component: () => import('@/components/layout/PublicLayout.vue'),
+            children: [
+               {
+                  path: '',
+                  name: 'landing',
+                  component: () => import('@/views/LandingView.vue'), // главная = лендинг
+               },
+               {
+                  path: 'login',
+                  name: 'login',
+                  component: () => import('@/views/LoginView.vue'),
+                  meta: { guestOnly: true },
+               },
+               {
+                  path: 'register',
+                  name: 'register',
+                  component: () => import('@/views/RegisterView.vue'),
+                  meta: { guestOnly: true },
+               },
+            ],
          },
       ],
    },
