@@ -58,6 +58,7 @@
       margin-bottom: var(--space-2);
 
       color: var(--color-text-primary);
+      font-family: var(--font-mono);
       font-size: 40px;
       font-weight: var(--font-bold);
       line-height: var(--leading-tight);

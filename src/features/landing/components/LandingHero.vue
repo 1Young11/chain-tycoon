@@ -112,17 +112,17 @@ onBeforeUnmount(() => {
 .hero {
    position: relative;
 
-   padding-block: var(--space-20);
+   padding-block: var(--space-24);
 
    background-image: radial-gradient(var(--color-border) 1px, transparent 1px);
    background-size: 32px 32px;
 
    @include lg {
-      padding-block: var(--space-10);
+      padding-block: var(--space-16);
    }
 
    @include md {
-      padding-block: var(--space-8);
+      padding-block: var(--space-12);
       background-size: 24px 24px;
    }
 
@@ -260,12 +260,12 @@ onBeforeUnmount(() => {
       gap: var(--space-4);
       width: 100%;
       min-width: 0;
-      padding: var(--space-5);
+      padding: var(--space-6);
 
       border-radius: var(--radius-lg);
 
       @include md {
-         padding: var(--space-4);
+         padding: var(--space-5);
       }
    }
 
@@ -346,7 +346,7 @@ onBeforeUnmount(() => {
       @include glass;
       @include flex-col;
       gap: var(--space-2);
-      padding: var(--space-8);
+      padding: var(--space-10) var(--space-8);
 
       border-color: rgba(108, 99, 255, 0.2);
       border-radius: var(--radius-lg);
@@ -354,7 +354,7 @@ onBeforeUnmount(() => {
       text-align: center;
 
       @include md {
-         padding: var(--space-6);
+         padding: var(--space-8) var(--space-5);
       }
    }
 
