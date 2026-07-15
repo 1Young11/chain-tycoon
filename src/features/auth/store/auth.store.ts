@@ -7,15 +7,10 @@ const AUTH_TOKEN_KEY = 'chain-tycoon-token'
 const AUTH_USER_KEY = 'chain-tycoon-user'
 
 export const useAuthStore = defineStore('auth', () => {
-<<<<<<< HEAD
-   const isAuthenticated = ref(true)
-   const user = ref<{ id: string; username: string } | null>(null)
-=======
    const user = ref<AuthUser | null>(null)
    const token = ref<string | null>(null)
    const loading = ref(false)
    const error = ref('')
->>>>>>> feature/auth
 
    const isAuthenticated = computed(() => Boolean(token.value && user.value))
 

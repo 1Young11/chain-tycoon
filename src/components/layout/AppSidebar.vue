@@ -1,90 +1,233 @@
 <script setup lang="ts">
+import { computed } from 'vue'
 import { useRouter } from 'vue-router'
+import { useAuthStore } from '@/features/auth'
 
 const router = useRouter()
+const authStore = useAuthStore()
 
 const navItems = [
-   { name: 'dashboard', label: 'Dashboard', icon: '⬛' },
-   { name: 'portfolio', label: 'Portfolio', icon: '📊' },
-   { name: 'mining', label: 'Mining', icon: '⚡' },
-   { name: 'market', label: 'Market', icon: '🌊' },
-   { name: 'leaderboard', label: 'Leaderboard', icon: '🏆' },
+   { name: 'dashboard', label: 'Dashboard', icon: 'fa-chart-line' },
+   { name: 'portfolio', label: 'Portfolio', icon: 'fa-wallet' },
+   { name: 'mining', label: 'Mining', icon: 'fa-microchip' },
+   { name: 'market', label: 'Market Events', icon: 'fa-bolt' },
+   { name: 'leaderboard', label: 'Leaderboard', icon: 'fa-trophy' },
 ]
+
+const username = computed(() => authStore.user?.username ?? 'CryptoMaster')
+const initials = computed(() =>
+   username.value
+      .split(/\s+/)
+      .filter(Boolean)
+      .slice(0, 2)
+      .map((part) => part[0]?.toUpperCase())
+      .join('') || 'CT',
+)
+
+const logout = async () => {
+   authStore.logout()
+   await router.push({ name: 'login' })
+}
 </script>
 
 <template>
    <aside class="sidebar">
-      <div class="sidebar__logo">
-         Chain<span class="sidebar__logo-accent">Tycoon</span>
-      </div>
+      <RouterLink to="/" class="sidebar__logo">
+         <i class="fa-solid fa-cubes"></i>
+         <span>Chain Tycoon</span>
+      </RouterLink>
 
-      <nav class="sidebar__nav">
-         <RouterLink v-for="item in navItems" :key="item.name" :to="{ name: item.name }" class="sidebar__nav-item"
-            active-class="sidebar__nav-item--active">
-            <span class="sidebar__nav-icon">{{ item.icon }}</span>
-            <span class="sidebar__nav-label">{{ item.label }}</span>
+      <nav class="sidebar__nav" aria-label="Application navigation">
+         <RouterLink
+            v-for="item in navItems"
+            :key="item.name"
+            :to="{ name: item.name }"
+            class="sidebar__link"
+            active-class="sidebar__link--active"
+         >
+            <i class="fa-solid" :class="item.icon"></i>
+            <span>{{ item.label }}</span>
          </RouterLink>
       </nav>
+
+      <div class="sidebar__divider"></div>
+
+      <div class="sidebar__footer">
+         <div class="sidebar__profile">
+            <div class="sidebar__avatar">{{ initials }}</div>
+            <span class="sidebar__username">{{ username }}</span>
+         </div>
+
+         <button class="sidebar__logout" type="button" @click="logout">
+            <i class="fa-solid fa-right-from-bracket"></i>
+            <span>Logout</span>
+         </button>
+      </div>
    </aside>
 </template>
 
-<style scoped>
+<style scoped lang="scss">
 .sidebar {
-   width: 240px;
-   min-height: 100vh;
-   background: var(--color-bg-secondary);
-   border-right: 1px solid var(--color-border);
+   position: sticky;
+   top: 0;
+   z-index: var(--z-sticky);
+
    display: flex;
+   width: 220px;
+   height: 100vh;
+   flex: 0 0 220px;
    flex-direction: column;
    padding: var(--space-6) var(--space-4);
-   flex-shrink: 0;
+
+   border-right: 1px solid var(--color-border);
+   background: var(--color-bg-secondary);
+
+   &__logo {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: var(--space-8);
+      padding-left: var(--space-2);
+
+      color: var(--color-text-primary);
+      font-size: var(--text-base);
+      font-weight: var(--font-bold);
+
+      i {
+         color: var(--color-accent);
+      }
+   }
+
+   &__nav {
+      display: flex;
+      flex-direction: column;
+      gap: var(--space-1);
+   }
+
+   &__link {
+      display: flex;
+      align-items: center;
+      gap: var(--space-3);
+      height: 36px;
+      padding: 0 var(--space-3);
+
+      border-left: 2px solid transparent;
+      border-radius: var(--radius-sm);
+
+      color: var(--color-text-secondary);
+      font-size: var(--text-sm);
+      font-weight: var(--font-medium);
+      transition: all var(--duration-base) var(--ease-default);
+
+      i {
+         width: 16px;
+         font-size: 14px;
+         text-align: center;
+      }
+
+      &:hover {
+         background: rgba(255, 255, 255, 0.03);
+         color: var(--color-text-primary);
+      }
+
+      &--active {
+         padding-left: 10px;
+
+         border-left-color: var(--color-accent);
+         border-top-left-radius: 0;
+         border-bottom-left-radius: 0;
+         background: rgba(108, 99, 255, 0.08);
+
+         color: var(--color-text-primary);
+      }
+   }
+
+   &__divider {
+      height: 1px;
+      margin: var(--space-5) 0;
+
+      background: var(--color-border);
+   }
+
+   &__footer {
+      display: flex;
+      flex-direction: column;
+      gap: var(--space-4);
+      margin-top: auto;
+   }
+
+   &__profile {
+      display: flex;
+      align-items: center;
+      gap: var(--space-3);
+      padding: var(--space-2);
+
+      border: 1px solid rgba(255, 255, 255, 0.06);
+      border-radius: var(--radius-sm);
+      background: rgba(255, 255, 255, 0.02);
+   }
+
+   &__avatar {
+      display: flex;
+      width: 28px;
+      height: 28px;
+      align-items: center;
+      justify-content: center;
+
+      border-radius: var(--radius-full);
+      background: linear-gradient(135deg, var(--color-accent), #8f88ff);
+
+      color: #fff;
+      font-size: 11px;
+      font-weight: var(--font-bold);
+   }
+
+   &__username {
+      overflow: hidden;
+
+      color: var(--color-text-primary);
+      font-size: var(--text-xs);
+      font-weight: var(--font-semibold);
+      text-overflow: ellipsis;
+      white-space: nowrap;
+   }
+
+   &__logout {
+      display: flex;
+      width: fit-content;
+      align-items: center;
+      gap: var(--space-2);
+      padding: var(--space-2);
+
+      border: 0;
+      border-radius: var(--radius-sm);
+      background: transparent;
+
+      color: var(--color-text-muted);
+      font-family: var(--font-sans);
+      font-size: var(--text-sm);
+      font-weight: var(--font-medium);
+      cursor: pointer;
+      transition: all var(--duration-base) var(--ease-default);
+
+      &:hover {
+         background: rgba(255, 83, 112, 0.08);
+         color: var(--color-loss);
+      }
+   }
 }
 
-.sidebar__logo {
-   font-size: var(--text-xl);
-   font-weight: var(--font-bold);
-   color: var(--color-text-primary);
-   margin-bottom: var(--space-8);
-   padding: 0 var(--space-2);
-}
+@include md {
+   .sidebar {
+      position: static;
 
-.sidebar__logo-accent {
-   color: var(--color-accent);
-}
+      width: 100%;
+      height: auto;
+      flex-basis: auto;
 
-.sidebar__nav {
-   display: flex;
-   flex-direction: column;
-   gap: var(--space-1);
-}
-
-.sidebar__nav-item {
-   display: flex;
-   align-items: center;
-   gap: var(--space-3);
-   padding: var(--space-3) var(--space-3);
-   border-radius: var(--radius-md);
-   color: var(--color-text-secondary);
-   font-size: var(--text-sm);
-   font-weight: var(--font-medium);
-   transition: all var(--duration-fast) var(--ease-default);
-   border-left: 2px solid transparent;
-}
-
-.sidebar__nav-item:hover {
-   background: var(--color-bg-tertiary);
-   color: var(--color-text-primary);
-}
-
-.sidebar__nav-item--active {
-   background: var(--color-accent-subtle);
-   color: var(--color-accent);
-   border-left-color: var(--color-accent);
-}
-
-.sidebar__nav-icon {
-   font-size: var(--text-base);
-   width: 20px;
-   text-align: center;
+      &__footer {
+         display: none;
+      }
+   }
 }
 </style>
