@@ -56,9 +56,22 @@ export const routes: RouteRecordRaw[] = [
          },
          {
             path: 'mining',
-            name: 'mining',
             component: () => import('@/views/MiningView.vue'),
             meta: { title: 'Mining' },
+            children: [
+               {
+                  path: '',
+                  name: 'mining-overview',
+                  component: () => import('@/views/MiningOverviewView.vue'),
+                  meta: { title: 'Mining' },
+               },
+               {
+                  path: 'inventory',
+                  name: 'mining-inventory',
+                  component: () => import('@/views/MiningInventoryView.vue'),
+                  meta: { title: 'Mining / Inventory' },
+               },
+            ],
          },
          {
             path: 'market',

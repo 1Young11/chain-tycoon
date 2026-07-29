@@ -1,0 +1,38 @@
+<script setup lang="ts">
+import { statusLabels } from '../model/equipment.utils'
+import type { EquipmentStatus } from '../model/equipment.types'
+
+defineProps<{ status: EquipmentStatus }>()
+</script>
+
+<template>
+   <span class="equipment-status" :class="`equipment-status--${status}`">
+      <i class="equipment-status__dot" aria-hidden="true"></i>
+      {{ statusLabels[status] }}
+   </span>
+</template>
+
+<style scoped lang="scss">
+.equipment-status {
+   display: inline-flex;
+   width: fit-content;
+   align-items: center;
+   gap: 6px;
+   padding: 4px 7px;
+   border: 1px solid currentColor;
+   border-radius: 5px;
+   font-size: 9px;
+   font-weight: var(--font-semibold);
+   line-height: 1;
+   white-space: nowrap;
+
+   &__dot { width: 5px; height: 5px; border-radius: 50%; background: currentColor; }
+   &--installed { color: var(--color-profit); background: var(--color-profit-subtle); }
+   &--in_storage { color: var(--color-text-secondary); background: rgba(144, 144, 168, 0.08); }
+   &--reserved { color: var(--color-accent); background: var(--color-accent-subtle); }
+   &--installing { color: var(--color-info); background: var(--color-info-subtle); }
+   &--repairing,
+   &--for_sale { color: var(--color-warning); background: var(--color-warning-subtle); }
+   &--broken { color: var(--color-loss); background: var(--color-loss-subtle); }
+}
+</style>

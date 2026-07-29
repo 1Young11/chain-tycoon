@@ -1,18 +1,22 @@
 <script setup lang="ts">
 import { computed } from 'vue'
-import { useRouter } from 'vue-router'
+import { useRoute, useRouter } from 'vue-router'
 import { useAuthStore } from '@/features/auth'
 
 const router = useRouter()
+const route = useRoute()
 const authStore = useAuthStore()
 
 const navItems = [
    { name: 'dashboard', label: 'Dashboard', icon: 'fa-chart-line' },
    { name: 'portfolio', label: 'Portfolio', icon: 'fa-wallet' },
-   { name: 'mining', label: 'Mining', icon: 'fa-microchip' },
+   { name: 'mining-overview', label: 'Mining', icon: 'fa-microchip', pathPrefix: '/app/mining' },
    { name: 'market', label: 'Market Events', icon: 'fa-bolt' },
    { name: 'leaderboard', label: 'Leaderboard', icon: 'fa-trophy' },
 ]
+
+const isNavItemActive = (item: (typeof navItems)[number]) =>
+   item.pathPrefix ? route.path.startsWith(item.pathPrefix) : route.name === item.name
 
 const username = computed(() => authStore.user?.username ?? 'CryptoMaster')
 const initials = computed(() =>
@@ -43,7 +47,7 @@ const logout = async () => {
             :key="item.name"
             :to="{ name: item.name }"
             class="sidebar__link"
-            active-class="sidebar__link--active"
+            :class="{ 'sidebar__link--active': isNavItemActive(item) }"
          >
             <i class="fa-solid" :class="item.icon"></i>
             <span>{{ item.label }}</span>
@@ -139,6 +143,10 @@ const logout = async () => {
          background: rgba(108, 99, 255, 0.08);
 
          color: var(--color-text-primary);
+
+         i {
+            color: var(--color-accent);
+         }
       }
    }
 
