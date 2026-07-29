@@ -30,11 +30,11 @@ const emit = defineEmits<{ select: [id: string] }>()
 
 <style scoped lang="scss">
 .equipment-table-wrap { overflow-x:auto;border:1px solid var(--color-border);border-radius:var(--radius-sm);background:var(--color-bg-tertiary);@include custom-scrollbar; }
-.equipment-table { width:100%;min-width:920px;border-collapse:collapse;font-size:10px;white-space:nowrap; }
-.equipment-table th { padding:11px 12px;border-bottom:1px solid var(--color-border);color:var(--color-text-secondary);font-size:9px;font-weight:var(--font-semibold);text-align:left;text-transform:uppercase; }
-.equipment-table td { padding:12px;border-bottom:1px solid rgba(255,255,255,.045);color:var(--color-text-secondary); }
+.equipment-table { width:100%;min-width:980px;border-collapse:collapse;font-size:var(--text-xs);white-space:nowrap; }
+.equipment-table th { padding:12px 14px;border-bottom:1px solid var(--color-border);color:var(--color-text-secondary);font-size:var(--text-2xs);font-weight:var(--font-semibold);text-align:left;text-transform:uppercase; }
+.equipment-table td { padding:14px;border-bottom:1px solid rgba(255,255,255,.045);color:var(--color-text-secondary); }
 .equipment-table tbody tr { outline:0;cursor:pointer; }
 .equipment-table tbody tr:hover,.equipment-table tbody tr:focus-visible { background:rgba(255,255,255,.025); }
 .equipment-table__row--selected { background:var(--color-accent-subtle)!important;box-shadow:inset 2px 0 var(--color-accent); }
-.equipment-table td:first-child strong,.equipment-table td:first-child small{display:block;}.equipment-table td:first-child strong{color:var(--color-text-primary);font-size:11px;}.equipment-table td:first-child small{color:var(--color-text-muted);font-size:8px;}.equipment-table__value{color:var(--color-text-primary)!important;font-weight:var(--font-semibold);}
+.equipment-table td:first-child strong,.equipment-table td:first-child small{display:block;}.equipment-table td:first-child strong{color:var(--color-text-primary);font-size:var(--text-sm);}.equipment-table td:first-child small{color:var(--color-text-muted);font-size:var(--text-2xs);}.equipment-table__value{color:var(--color-text-primary)!important;font-weight:var(--font-semibold);}
 </style>

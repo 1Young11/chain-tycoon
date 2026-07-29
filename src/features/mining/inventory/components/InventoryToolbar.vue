@@ -88,23 +88,23 @@ const statuses: Array<EquipmentStatus | 'all'> = ['all', 'in_storage', 'installe
 <style scoped lang="scss">
 .inventory-toolbar {
    border:1px solid var(--color-border);border-radius:var(--radius-sm);background:var(--color-bg-tertiary);
-   &__primary,&__filters { display:flex;align-items:center;justify-content:space-between;gap:var(--space-4);padding:10px 12px; }
+   &__primary,&__filters { display:flex;align-items:center;justify-content:space-between;gap:var(--space-4);padding:13px 14px; }
    &__primary { border-bottom:1px solid rgba(255,255,255,.055); }
    &__tabs { display:flex;min-width:0;gap:3px;overflow-x:auto; @include custom-scrollbar; }
-   &__tab { padding:7px 9px;border-radius:6px;color:var(--color-text-secondary);font-size:10px;font-weight:var(--font-semibold);white-space:nowrap; }
+   &__tab { min-height:var(--control-height-sm);padding:8px 12px;border-radius:6px;color:var(--color-text-secondary);font-size:var(--text-xs);font-weight:var(--font-semibold);white-space:nowrap; }
    &__tab:hover { color:var(--color-text-primary);background:rgba(255,255,255,.03); }
    &__tab--active { background:var(--color-accent-subtle);color:var(--color-accent); }
-   &__search { position:relative;display:flex;min-width:180px;align-items:center; }
-   &__search i { position:absolute;left:10px;color:var(--color-text-muted);font-size:10px; }
-   &__search input,select { height:32px;border:1px solid var(--color-border);border-radius:6px;outline:0;background:var(--color-bg-elevated);color:var(--color-text-primary);font-size:10px; }
-   &__search input { width:100%;padding:0 10px 0 28px; }
+   &__search { position:relative;display:flex;min-width:210px;align-items:center; }
+   &__search i { position:absolute;left:12px;color:var(--color-text-muted);font-size:var(--text-2xs); }
+   &__search input,select { height:var(--control-height-md);border:1px solid var(--color-border);border-radius:6px;outline:0;background:var(--color-bg-elevated);color:var(--color-text-primary);font-size:var(--text-xs); }
+   &__search input { width:100%;padding:0 12px 0 34px; }
    &__search input:focus,select:focus { border-color:var(--color-accent);box-shadow:0 0 0 2px var(--color-accent-subtle); }
-   select { min-width:132px;padding:0 24px 0 9px; }
-   &__filter-group { display:flex;align-items:center;gap:7px; }
-   &__clear { display:flex;align-items:center;gap:5px;padding:7px;color:var(--color-text-muted);font-size:9px; }
+   select { min-width:152px;padding:0 28px 0 11px; }
+   &__filter-group { display:flex;align-items:center;gap:9px; }
+   &__clear { display:flex;min-height:var(--control-height-sm);align-items:center;gap:6px;padding:8px 10px;color:var(--color-text-muted);font-size:var(--text-2xs); }
    &__clear:hover,&__clear:focus-visible { color:var(--color-text-primary); }
    &__view { display:flex;padding:2px;border:1px solid var(--color-border);border-radius:6px;background:var(--color-bg-elevated); }
-   &__view-button { display:grid;width:27px;height:27px;place-items:center;border-radius:4px;color:var(--color-text-muted);font-size:10px; }
+   &__view-button { display:grid;width:34px;height:34px;place-items:center;border-radius:4px;color:var(--color-text-muted);font-size:var(--text-xs); }
    &__view-button--active { background:var(--color-accent);color:white; }
    &__sr-only { @include visually-hidden; }
 }

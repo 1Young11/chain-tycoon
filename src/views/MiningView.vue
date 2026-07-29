@@ -18,7 +18,7 @@
 
    &__nav {
       display: flex;
-      min-height: 38px;
+      min-height: 42px;
       align-items: flex-end;
       gap: var(--space-5);
       padding: 0 var(--space-8);
@@ -28,15 +28,15 @@
 
    &__link {
       display: flex;
-      height: 38px;
+      height: 42px;
       align-items: center;
       gap: 7px;
       border-bottom: 2px solid transparent;
       color: var(--color-text-secondary);
-      font-size: 10px;
+      font-size: var(--text-xs);
       font-weight: var(--font-semibold);
 
-      i { font-size: 9px; }
+      i { font-size: var(--text-2xs); }
       &:hover { color: var(--color-text-primary); }
       &--active { border-bottom-color: var(--color-accent); color: var(--color-text-primary); }
    }

@@ -22,17 +22,17 @@ const label = computed(() => getConditionLabel(value.value))
 <style scoped lang="scss">
 .condition {
    display: grid;
-   gap: 6px;
+   gap: 7px;
 
-   &__meta { display: flex; align-items: center; justify-content: space-between; gap: var(--space-2); color: var(--color-text-secondary); font-size: 10px; }
-   &__meta strong { color: var(--color-text-primary); font-size: 10px; font-weight: var(--font-semibold); }
-   &__track { height: 5px; overflow: hidden; border-radius: var(--radius-full); background: var(--color-border); }
+   &__meta { display: flex; align-items: center; justify-content: space-between; gap: var(--space-2); color: var(--color-text-secondary); font-size: var(--text-xs); }
+   &__meta strong { color: var(--color-text-primary); font-size: var(--text-2xs); font-weight: var(--font-semibold); }
+   &__track { height: 6px; overflow: hidden; border-radius: var(--radius-full); background: var(--color-border); }
    &__fill { display: block; height: 100%; border-radius: inherit; }
    &__fill--excellent,
    &__fill--good { background: var(--color-profit); }
    &__fill--worn { background: var(--color-warning); }
    &__fill--poor,
    &__fill--critical { background: var(--color-loss); }
-   &--compact { min-width: 90px; }
+   &--compact { min-width: 106px; }
 }
 </style>

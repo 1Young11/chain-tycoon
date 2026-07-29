@@ -34,21 +34,22 @@ const items = [
 </template>
 
 <style scoped lang="scss">
-.inventory-summary { display: grid; grid-template-columns: repeat(5,minmax(0,1fr)); gap: 10px; }
+.inventory-summary { display: grid; grid-template-columns: repeat(5,minmax(0,1fr)); gap: 12px; }
 .summary-tile {
    display: flex;
    min-width: 0;
    align-items: center;
-   gap: 10px;
-   padding: 12px;
+   min-height: 80px;
+   gap: 12px;
+   padding: 13px 15px;
    border: 1px solid var(--color-border);
    border-radius: var(--radius-sm);
    background: var(--color-bg-tertiary);
 
-   &__icon { display:grid;width:30px;height:30px;flex:0 0 auto;place-items:center;border-radius:7px;background:var(--color-bg-elevated);color:var(--color-accent);font-size:11px; }
+   &__icon { display:grid;width:35px;height:35px;flex:0 0 auto;place-items:center;border-radius:8px;background:var(--color-bg-elevated);color:var(--color-accent);font-size:14px; }
    > span:last-child { display:grid;min-width:0; }
-   small { overflow:hidden;color:var(--color-text-secondary);font-size:9px;text-overflow:ellipsis;white-space:nowrap; }
-   strong { margin-top:2px;font-size:var(--text-sm); }
+   small { overflow:hidden;color:var(--color-text-secondary);font-size:var(--text-xs);text-overflow:ellipsis;white-space:nowrap; }
+   strong { margin-top:3px;font-size:var(--text-display-sm); }
    &--attention .summary-tile__icon,
    &--attention strong { color:var(--color-warning); }
    &--value { border-color:rgba(108,99,255,.3);background:linear-gradient(135deg,rgba(108,99,255,.08),var(--color-bg-tertiary)); }

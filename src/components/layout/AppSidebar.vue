@@ -94,7 +94,7 @@ const logout = async () => {
       padding-left: var(--space-2);
 
       color: var(--color-text-primary);
-      font-size: var(--text-base);
+      font-size: var(--text-lg);
       font-weight: var(--font-bold);
 
       i {
@@ -105,15 +105,15 @@ const logout = async () => {
    &__nav {
       display: flex;
       flex-direction: column;
-      gap: var(--space-1);
+      gap: 3px;
    }
 
    &__link {
       display: flex;
       align-items: center;
       gap: var(--space-3);
-      height: 36px;
-      padding: 0 var(--space-3);
+      height: 44px;
+      padding: 0 14px;
 
       border-left: 2px solid transparent;
       border-radius: var(--radius-sm);
@@ -124,8 +124,8 @@ const logout = async () => {
       transition: all var(--duration-base) var(--ease-default);
 
       i {
-         width: 16px;
-         font-size: 14px;
+         width: 18px;
+         font-size: 17px;
          text-align: center;
       }
 
@@ -194,7 +194,7 @@ const logout = async () => {
       overflow: hidden;
 
       color: var(--color-text-primary);
-      font-size: var(--text-xs);
+      font-size: var(--text-sm);
       font-weight: var(--font-semibold);
       text-overflow: ellipsis;
       white-space: nowrap;

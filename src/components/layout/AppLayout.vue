@@ -120,7 +120,7 @@ onBeforeUnmount(() => {
 
    &__title {
       color: var(--color-text-primary);
-      font-size: var(--text-lg);
+      font-size: var(--text-display-sm);
       font-weight: var(--font-bold);
    }
 
@@ -132,9 +132,10 @@ onBeforeUnmount(() => {
 
    &__badge {
       display: flex;
+      min-height: 32px;
       align-items: center;
       gap: 6px;
-      padding: var(--space-1) 10px;
+      padding: var(--space-1) 12px;
 
       border: 1px solid rgba(255, 255, 255, 0.06);
       border-radius: var(--radius-full);

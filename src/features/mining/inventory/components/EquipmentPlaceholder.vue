@@ -29,7 +29,7 @@ const imageFailed = ref(false)
    position: relative;
    display: grid;
    width: 100%;
-   height: 116px;
+   height: 128px;
    place-items: center;
    overflow: hidden;
    border: 1px solid rgba(255, 255, 255, 0.045);
@@ -40,11 +40,11 @@ const imageFailed = ref(false)
 
    &::before { position: absolute; inset: 0; background-image: linear-gradient(rgba(255,255,255,.018) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,.018) 1px, transparent 1px); background-size: 14px 14px; content: ''; }
    img { position: relative; width: 100%; height: 100%; object-fit: contain; }
-   &__caption { position: absolute; right: 7px; bottom: 5px; color: var(--color-text-muted); font-family: var(--font-mono); font-size: 7px; letter-spacing: .08em; text-transform: uppercase; }
+   &__caption { position: absolute; right: 8px; bottom: 6px; color: var(--color-text-muted); font-family: var(--font-mono); font-size: var(--text-2xs); letter-spacing: .08em; text-transform: uppercase; }
 }
 
 .hardware { position: relative; z-index: 1; filter: drop-shadow(0 8px 12px rgba(0,0,0,.42)); }
-.hardware--gpu { display: flex; width: 132px; height: 58px; align-items: center; justify-content: center; gap: 7px; border: 2px solid #5e5e75; border-radius: 7px; background: linear-gradient(145deg, #343444, #20202c); box-shadow: inset 0 0 0 3px #191923; }
+.hardware--gpu { display: flex; width: 144px; height: 64px; align-items: center; justify-content: center; gap: 7px; border: 2px solid #5e5e75; border-radius: 7px; background: linear-gradient(145deg, #343444, #20202c); box-shadow: inset 0 0 0 3px #191923; }
 .hardware--gpu > b { position: absolute; right: -8px; width: 8px; height: 36px; border: 1px solid #68687c; background: #292936; }
 .hardware__fan { display: grid; width: 32px; height: 32px; place-items: center; border: 2px solid #77778c; border-radius: 50%; background: repeating-conic-gradient(#5b5b70 0 12deg, #282835 12deg 32deg); }
 .hardware__fan span { width: 8px; height: 8px; border-radius: 50%; background: var(--color-accent); box-shadow: 0 0 8px rgba(108,99,255,.65); }

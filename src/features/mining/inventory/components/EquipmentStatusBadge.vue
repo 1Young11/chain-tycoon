@@ -18,10 +18,11 @@ defineProps<{ status: EquipmentStatus }>()
    width: fit-content;
    align-items: center;
    gap: 6px;
-   padding: 4px 7px;
+   min-height: 24px;
+   padding: 4px 8px;
    border: 1px solid currentColor;
    border-radius: 5px;
-   font-size: 9px;
+   font-size: var(--text-2xs);
    font-weight: var(--font-semibold);
    line-height: 1;
    white-space: nowrap;
