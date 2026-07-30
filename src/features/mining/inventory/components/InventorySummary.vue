@@ -20,14 +20,14 @@ const items = [
 <template>
    <section class="inventory-summary" aria-label="Inventory summary">
       <article v-for="item in items" :key="item.key" class="summary-tile" :class="{ 'summary-tile--attention': item.key === 'attention' }">
-         <span class="summary-tile__icon"><i class="fa-solid" :class="item.icon"></i></span>
+         <span class="summary-tile__icon"><i class="fa-solid" :class="item.icon" aria-hidden="true"></i></span>
          <span>
             <small>{{ item.label }}</small>
             <strong class="text-mono">{{ { total, storage, installed, attention }[item.key] }}</strong>
          </span>
       </article>
       <article class="summary-tile summary-tile--value">
-         <span class="summary-tile__icon"><i class="fa-solid fa-dollar-sign"></i></span>
+         <span class="summary-tile__icon"><i class="fa-solid fa-dollar-sign" aria-hidden="true"></i></span>
          <span><small>Inventory Value</small><strong class="text-mono">{{ formatInventoryCurrency(value) }}</strong></span>
       </article>
    </section>

@@ -59,8 +59,15 @@ export const useInventoryStore = defineStore('mining-inventory', () => {
    const totalInventoryValue = computed(() =>
       equipment.value.reduce((total, item) => total + item.currentValueUsd, 0),
    )
+   const hasActiveFilters = computed(() =>
+      Boolean(searchQuery.value.trim()) ||
+      selectedCategory.value !== 'all' ||
+      selectedStatus.value !== 'all' ||
+      selectedLocation.value !== 'all' ||
+      sortMode.value !== 'condition_desc',
+   )
 
-   const selectEquipment = (id: string) => { selectedEquipmentId.value = id }
+   const selectEquipment = (id: string | null) => { selectedEquipmentId.value = id }
    const setSearchQuery = (query: string) => { searchQuery.value = query }
    const setCategory = (category: EquipmentCategory | 'all') => { selectedCategory.value = category }
    const setStatus = (status: EquipmentStatus | 'all') => { selectedStatus.value = status }
@@ -92,6 +99,7 @@ export const useInventoryStore = defineStore('mining-inventory', () => {
       storageCount,
       needsAttentionCount,
       totalInventoryValue,
+      hasActiveFilters,
       selectEquipment,
       setSearchQuery,
       setCategory,
