@@ -1,12 +1,29 @@
 <script setup lang="ts">
+import { computed } from 'vue'
 import EquipmentConditionBar from './EquipmentConditionBar.vue'
 import EquipmentPlaceholder from './EquipmentPlaceholder.vue'
 import EquipmentStatusBadge from './EquipmentStatusBadge.vue'
 import { categoryLabels, formatInventoryCurrency } from '../model/equipment.utils'
 import type { EquipmentInstance } from '../model/equipment.types'
 
-defineProps<{ equipment: EquipmentInstance; selected: boolean }>()
+const props = defineProps<{ equipment: EquipmentInstance; selected: boolean }>()
 const emit = defineEmits<{ select: [id: string] }>()
+
+const metricLayout = computed<'compact-three' | 'balanced-two'>(() => {
+   const equipment = props.equipment
+   const needsMoreRoom =
+      equipment.category === 'psu' ||
+      equipment.category === 'base_system' ||
+      equipment.status === 'broken' ||
+      equipment.status === 'repairing'
+
+   return needsMoreRoom ? 'balanced-two' : 'compact-three'
+})
+
+const cardMetrics = computed(() => [
+   ...props.equipment.cardMetrics.slice(0, 2),
+   { label: 'Value', value: formatInventoryCurrency(props.equipment.currentValueUsd) },
+])
 </script>
 
 <template>
@@ -32,9 +49,16 @@ const emit = defineEmits<{ select: [id: string] }>()
          <span class="text-mono">#{{ equipment.id }}</span>
       </div>
       <EquipmentConditionBar :condition="equipment.condition" />
-      <dl class="equipment-card__metrics">
-         <div v-for="metric in equipment.cardMetrics.slice(0, 2)" :key="metric.label"><dt>{{ metric.label }}</dt><dd class="text-mono">{{ metric.value }}</dd></div>
-         <div><dt>Value</dt><dd class="text-mono">{{ formatInventoryCurrency(equipment.currentValueUsd) }}</dd></div>
+      <dl class="equipment-card__metrics" :class="`equipment-card__metrics--${metricLayout}`">
+         <div
+            v-for="(metric, index) in cardMetrics"
+            :key="metric.label"
+            class="equipment-card__metric"
+            :class="{ 'equipment-card__metric--featured': metricLayout === 'balanced-two' && index === cardMetrics.length - 1 }"
+         >
+            <dt class="equipment-card__metric-label">{{ metric.label }}</dt>
+            <dd class="equipment-card__metric-value text-mono">{{ metric.value }}</dd>
+         </div>
       </dl>
       <footer class="equipment-card__footer">
          <span><i class="fa-solid fa-location-dot" aria-hidden="true"></i>{{ equipment.locationName ?? 'Unassigned' }}</span>
@@ -55,11 +79,14 @@ const emit = defineEmits<{ select: [id: string] }>()
    &__identity { min-height:46px; }
    &__identity h3 { font-size:17px; }
    &__identity span { color:var(--color-text-muted);font-size:var(--text-2xs); }
-   &__metrics { display:grid;grid-template-columns:repeat(3,minmax(0,1fr));margin-top:auto;border:1px solid rgba(255,255,255,.05);border-radius:6px;background:rgba(255,255,255,.018); }
-   &__metrics div { display:grid;gap:3px;padding:10px;border-right:1px solid rgba(255,255,255,.05); }
-   &__metrics div:last-child{border-right:0;}
-   &__metrics dt { color:var(--color-text-secondary);font-size:var(--text-2xs); }
-   &__metrics dd { overflow:hidden;font-size:var(--text-xs);font-weight:var(--font-semibold);text-overflow:ellipsis;white-space:nowrap; }
+   &__metrics { display:grid;gap:1px;margin-top:auto;overflow:hidden;border:1px solid rgba(255,255,255,.05);border-radius:6px;background:rgba(255,255,255,.05); }
+   &__metrics--compact-three { grid-template-columns:repeat(3,minmax(0,1fr)); }
+   &__metrics--balanced-two { grid-template-columns:minmax(0,.82fr) minmax(0,1.18fr); }
+   &__metric { display:flex;min-width:0;min-height:58px;flex-direction:column;align-items:flex-start;gap:4px;padding:9px;background:var(--color-bg-tertiary);text-align:left; }
+   &__metrics--balanced-two &__metric { min-height:42px;gap:3px;padding:5px 2px; }
+   &__metric--featured { grid-column:1/-1; }
+   &__metric-label { color:var(--color-text-secondary);font-size:var(--text-2xs);line-height:1.2; }
+   &__metric-value { max-width:100%;font-size:var(--text-xs);font-weight:var(--font-semibold);line-height:1.3;overflow-wrap:anywhere;white-space:normal; }
    &__footer { display:flex;align-items:center;justify-content:space-between;color:var(--color-text-muted);font-size:var(--text-2xs); }
    &__footer span { display:flex;align-items:center;gap:5px; }
    &--selected &__footer > i { color:var(--color-accent); }

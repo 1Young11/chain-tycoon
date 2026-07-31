@@ -29,7 +29,7 @@ export const equipmentMock: EquipmentInstance[] = [
       id: 'GPU-00188', modelId: 'nvidia-rtx-3060-ti', name: 'RTX 3060 Ti', category: 'gpu', status: 'broken', condition: 34,
       locationId: 'garage', locationName: 'Garage', farmId: 'garage-rig-2', farmName: 'Garage Rig #2',
       purchasePriceUsd: 480, currentValueUsd: 250, lifetimeRevenueUsd: 188, runtimeHours: 410, powerWatts: null,
-      cardMetrics: [{ label: 'Power', value: '0 W' }, { label: 'Status', value: 'Repair required' }],
+      cardMetrics: [{ label: 'Power', value: '0 W' }, { label: 'Repair Status', value: 'Required' }],
       performance: [{ algorithmOrCoin: 'Ravencoin', value: '0 MH/s' }, { algorithmOrCoin: 'Ergo', value: '0 MH/s' }, { algorithmOrCoin: 'Flux', value: '0 Sol/s' }],
       imageUrl: null,
    },
@@ -43,7 +43,7 @@ export const equipmentMock: EquipmentInstance[] = [
       id: 'PSU-00210', modelId: 'psu-1200-platinum', name: '1200W Platinum PSU', category: 'psu', status: 'repairing', condition: 68,
       locationId: 'service-center', locationName: 'Service Center', farmId: null, farmName: null,
       purchasePriceUsd: 315, currentValueUsd: 210, lifetimeRevenueUsd: 0, runtimeHours: 630, powerWatts: null,
-      cardMetrics: [{ label: 'Est. Finish', value: '2h 40m' }, { label: 'Efficiency', value: '80+ Platinum' }], performance: [], imageUrl: null,
+      cardMetrics: [{ label: 'Repair ETA', value: '2h 40m' }, { label: 'Efficiency', value: '80+ Platinum' }], performance: [], imageUrl: null,
    },
    {
       id: 'SYS-00012', modelId: 'home-base-system', name: 'Home Mining Base System', category: 'base_system', status: 'installed', condition: 91,
