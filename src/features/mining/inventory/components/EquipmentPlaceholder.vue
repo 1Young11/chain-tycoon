@@ -47,7 +47,8 @@ watch(() => props.imageUrl, () => { imageFailed.value = false })
    &__caption { position: absolute; right: 8px; bottom: 6px; color: var(--color-text-muted); font-family: var(--font-mono); font-size: var(--text-2xs); letter-spacing: .08em; text-transform: uppercase; }
 }
 .equipment-visual--compact { height:108px; }
-.equipment-visual--compact .hardware { transform:scale(.68); }
+.equipment-visual--compact img { width:auto;height:auto;max-width:88%;max-height:88%; }
+.equipment-visual--compact .hardware { transform:scale(.6); }
 
 .hardware { position: relative; z-index: 1; filter: drop-shadow(0 8px 12px rgba(0,0,0,.42)); }
 .hardware--gpu { display: flex; width: 144px; height: 64px; align-items: center; justify-content: center; gap: 7px; border: 2px solid #5e5e75; border-radius: 7px; background: linear-gradient(145deg, #343444, #20202c); box-shadow: inset 0 0 0 3px #191923; }
