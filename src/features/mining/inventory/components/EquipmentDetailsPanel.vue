@@ -3,7 +3,7 @@ import { nextTick, onBeforeUnmount, onMounted, ref, watch } from 'vue'
 import EquipmentConditionBar from './EquipmentConditionBar.vue'
 import EquipmentPlaceholder from './EquipmentPlaceholder.vue'
 import EquipmentStatusBadge from './EquipmentStatusBadge.vue'
-import { categoryLabels, formatInventoryCurrency, formatRuntime } from '../model/equipment.utils'
+import { categoryLabels, formatDuration, formatInventoryCurrency, formatRuntime } from '../model/equipment.utils'
 import type { EquipmentInstance } from '../model/equipment.types'
 
 const props = defineProps<{ equipment: EquipmentInstance | null; open: boolean }>()
@@ -90,6 +90,8 @@ onBeforeUnmount(() => {
             <dl>
                <div><dt>Location</dt><dd>{{ equipment.locationName ?? 'Unassigned' }}</dd></div>
                <div><dt>Farm</dt><dd>{{ equipment.farmName ?? '—' }}</dd></div>
+               <div v-if="equipment.status === 'repairing' && equipment.repairEtaMinutes !== undefined"><dt>Repair ETA</dt><dd class="text-mono">{{ formatDuration(equipment.repairEtaMinutes) }}</dd></div>
+               <div v-if="equipment.status === 'broken'"><dt>Service Status</dt><dd>Repair required</dd></div>
             </dl>
          </section>
 

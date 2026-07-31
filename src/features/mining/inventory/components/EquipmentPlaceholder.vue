@@ -1,13 +1,17 @@
 <script setup lang="ts">
-import { ref } from 'vue'
+import { ref, watch } from 'vue'
 import type { EquipmentCategory } from '../model/equipment.types'
 
-defineProps<{ category: EquipmentCategory; imageUrl: string | null; name: string }>()
+const props = withDefaults(defineProps<{ category: EquipmentCategory; imageUrl: string | null; name: string; compact?: boolean }>(), {
+   compact: false,
+})
 const imageFailed = ref(false)
+
+watch(() => props.imageUrl, () => { imageFailed.value = false })
 </script>
 
 <template>
-   <div class="equipment-visual" :class="`equipment-visual--${category}`">
+   <div class="equipment-visual" :class="[`equipment-visual--${category}`, { 'equipment-visual--compact': compact }]">
       <img v-if="imageUrl && !imageFailed" :src="imageUrl" :alt="name" @error="imageFailed = true" />
       <template v-else>
          <div v-if="category === 'gpu'" class="hardware hardware--gpu" aria-hidden="true">
@@ -42,6 +46,8 @@ const imageFailed = ref(false)
    img { position: relative; width: 100%; height: 100%; object-fit: contain; }
    &__caption { position: absolute; right: 8px; bottom: 6px; color: var(--color-text-muted); font-family: var(--font-mono); font-size: var(--text-2xs); letter-spacing: .08em; text-transform: uppercase; }
 }
+.equipment-visual--compact { height:108px; }
+.equipment-visual--compact .hardware { transform:scale(.68); }
 
 .hardware { position: relative; z-index: 1; filter: drop-shadow(0 8px 12px rgba(0,0,0,.42)); }
 .hardware--gpu { display: flex; width: 144px; height: 64px; align-items: center; justify-content: center; gap: 7px; border: 2px solid #5e5e75; border-radius: 7px; background: linear-gradient(145deg, #343444, #20202c); box-shadow: inset 0 0 0 3px #191923; }

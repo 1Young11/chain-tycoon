@@ -42,3 +42,9 @@ export const formatInventoryCurrency = (value: number) =>
    }).format(value)
 
 export const formatRuntime = (hours: number) => `${new Intl.NumberFormat('en-US').format(hours)} hours`
+
+export const formatDuration = (minutes: number) => {
+   const hours = Math.floor(minutes / 60)
+   const remainingMinutes = minutes % 60
+   return [hours ? `${hours}h` : '', remainingMinutes ? `${remainingMinutes}m` : ''].filter(Boolean).join(' ')
+}

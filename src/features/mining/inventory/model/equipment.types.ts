@@ -38,6 +38,7 @@ export type EquipmentInstance = {
    currentValueUsd: number
    lifetimeRevenueUsd: number
    runtimeHours: number
+   repairEtaMinutes?: number
    powerWatts: number | null
    cardMetrics: EquipmentMetric[]
    performance: EquipmentPerformance[]
