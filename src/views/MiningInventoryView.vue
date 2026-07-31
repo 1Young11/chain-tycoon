@@ -156,7 +156,7 @@ onBeforeUnmount(() => {
    &__buy:active { transform:translateY(1px);background:var(--color-accent-active); }
    &__buy:focus-visible { outline:var(--focus-ring);outline-offset:var(--focus-offset); }
    &__buy:disabled { background:var(--color-bg-elevated);color:var(--color-text-muted);cursor:not-allowed;box-shadow:none;transform:none; }
-   &__workspace { display:grid;min-width:0;grid-template-columns:minmax(0,1fr) minmax(340px,30%);gap:16px;align-items:start; }
+   &__workspace { display:grid;min-width:0;grid-template-columns:minmax(0,1fr) minmax(300px,26%);gap:14px;align-items:start; }
    &__results { min-width:0; }
    &__result-meta { display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;color:var(--color-text-muted);font-size:var(--text-2xs); }
    &__result-meta strong,&__result-meta b { color:var(--color-text-secondary); }

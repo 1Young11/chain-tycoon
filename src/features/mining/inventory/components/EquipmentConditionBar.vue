@@ -34,10 +34,10 @@ const label = computed(() => getConditionLabel(value.value))
    &__track { position:relative;width:100%;max-width:100%;height:6px;overflow:hidden;border-radius:var(--radius-full);background:var(--color-border); }
    &__fill { display: block;max-width:100%;height:100%;border-radius:inherit;transition:width var(--transition-slow),background-color var(--transition-base); }
    &__fill--excellent,
-   &__fill--good { background: var(--color-profit); }
-   &__fill--worn { background: var(--color-warning); }
+   &__fill--good { background:#45e6a2;box-shadow:0 0 8px rgba(69,230,162,.28); }
+   &__fill--worn { background:#ffc45c;box-shadow:0 0 8px rgba(255,196,92,.24); }
    &__fill--poor,
-   &__fill--critical { background: var(--color-loss); }
+   &__fill--critical { background:#ff627d;box-shadow:0 0 8px rgba(255,98,125,.24); }
    &--compact { gap:7px; }
 }
 @media(prefers-reduced-motion:reduce){.condition__fill{transition:none;}}

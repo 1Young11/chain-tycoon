@@ -36,31 +36,33 @@ watch(() => props.imageUrl, () => { imageFailed.value = false })
    height: 128px;
    place-items: center;
    overflow: hidden;
-   border: 1px solid rgba(255, 255, 255, 0.045);
+   border: 1px solid #35354a;
    border-radius: var(--radius-sm);
    background:
-      radial-gradient(circle at 50% 45%, rgba(108, 99, 255, 0.1), transparent 55%),
-      linear-gradient(145deg, rgba(255, 255, 255, 0.025), transparent);
+      radial-gradient(circle at 50% 40%, rgba(126, 116, 255, 0.19), transparent 52%),
+      linear-gradient(145deg, #282838, #191923);
+   box-shadow:inset 0 1px 0 rgba(255,255,255,.035),inset 0 -12px 28px rgba(0,0,0,.22);
 
    &::before { position: absolute; inset: 0; background-image: linear-gradient(rgba(255,255,255,.018) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,.018) 1px, transparent 1px); background-size: 14px 14px; content: ''; }
+   &::after { position:absolute;inset:1px;border-radius:inherit;background:linear-gradient(135deg,rgba(255,255,255,.045),transparent 34%);content:'';pointer-events:none; }
    img { position: relative; width: 100%; height: 100%; object-fit: contain; }
    &__caption { position: absolute; right: 8px; bottom: 6px; color: var(--color-text-muted); font-family: var(--font-mono); font-size: var(--text-2xs); letter-spacing: .08em; text-transform: uppercase; }
 }
 .equipment-visual--compact { height:108px; }
-.equipment-visual--compact img { width:auto;height:auto;max-width:88%;max-height:88%; }
-.equipment-visual--compact .hardware { transform:scale(.6); }
+.equipment-visual--compact img { width:auto;height:auto;max-width:96%;max-height:96%; }
+.equipment-visual--compact .hardware { transform:scale(.75); }
 
-.hardware { position: relative; z-index: 1; filter: drop-shadow(0 8px 12px rgba(0,0,0,.42)); }
-.hardware--gpu { display: flex; width: 144px; height: 64px; align-items: center; justify-content: center; gap: 7px; border: 2px solid #5e5e75; border-radius: 7px; background: linear-gradient(145deg, #343444, #20202c); box-shadow: inset 0 0 0 3px #191923; }
+.hardware { position: relative; z-index: 1; filter:drop-shadow(0 10px 10px rgba(0,0,0,.48)) drop-shadow(0 0 7px rgba(108,99,255,.12)); }
+.hardware--gpu { display: flex; width: 144px; height: 64px; align-items: center; justify-content: center; gap: 7px; border: 2px solid #77778e; border-radius: 7px; background:linear-gradient(160deg,#47475b 0%,#292938 48%,#1c1c27 100%);box-shadow:inset 0 1px 0 rgba(255,255,255,.08),inset 0 0 0 3px #191923; }
 .hardware--gpu > b { position: absolute; right: -8px; width: 8px; height: 36px; border: 1px solid #68687c; background: #292936; }
 .hardware__fan { display: grid; width: 32px; height: 32px; place-items: center; border: 2px solid #77778c; border-radius: 50%; background: repeating-conic-gradient(#5b5b70 0 12deg, #282835 12deg 32deg); }
 .hardware__fan span { width: 8px; height: 8px; border-radius: 50%; background: var(--color-accent); box-shadow: 0 0 8px rgba(108,99,255,.65); }
-.hardware--psu { width: 78px; height: 68px; border: 2px solid #626277; border-radius: 6px; background: linear-gradient(145deg,#343443,#1d1d28); }
+.hardware--psu { width: 78px; height: 68px; border:2px solid #77778d;border-radius:6px;background:linear-gradient(145deg,#454559,#20202c 72%);box-shadow:inset 0 1px 0 rgba(255,255,255,.08); }
 .hardware--psu i { position: absolute; top: 9px; left: 12px; width: 42px; height: 42px; border: 2px solid #77778c; border-radius: 50%; background: repeating-conic-gradient(#5c5c70 0 5deg,transparent 5deg 18deg); }
 .hardware--psu b { position: absolute; right: 7px; bottom: 6px; width: 8px; height: 5px; background: var(--color-profit); }
-.hardware--system { display: grid; width: 94px; height: 66px; grid-template-columns: repeat(3,1fr); gap: 6px; padding: 9px; border: 2px solid #626277; background: #282835; }
+.hardware--system { display: grid; width: 94px; height: 66px; grid-template-columns: repeat(3,1fr); gap: 6px; padding: 9px; border:2px solid #77778d;background:linear-gradient(155deg,#424255,#232330);box-shadow:inset 0 1px 0 rgba(255,255,255,.07); }
 .hardware--system i { border: 1px solid #66667b; border-radius: 3px; background: linear-gradient(#424255,#252532); }
-.hardware--frame { display: flex; width: 116px; height: 66px; align-items: flex-end; justify-content: space-around; padding: 7px; border: 4px solid #65657a; border-top-width: 2px; background: rgba(22,22,29,.7); }
+.hardware--frame { display: flex; width: 116px; height: 66px; align-items: flex-end; justify-content: space-around; padding: 7px; border:4px solid #77778d;border-top-width:2px;background:linear-gradient(180deg,rgba(49,49,65,.82),rgba(20,20,28,.9));box-shadow:inset 0 1px 0 rgba(255,255,255,.06); }
 .hardware--frame i { width: 18px; height: 45px; border: 1px solid #68687e; background: #2d2d3c; }
 .hardware--cooling i { display:grid; width:68px;height:68px;place-items:center;border:3px solid #66667a;border-radius:50%;background:repeating-conic-gradient(#505065 0 16deg,#252532 16deg 34deg); }
 .hardware--cooling span { width:14px;height:14px;border-radius:50%;background:var(--color-info); }
