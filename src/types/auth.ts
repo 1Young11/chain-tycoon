@@ -30,7 +30,6 @@ export type AuthResponse = {
 export type RawAuthResponse = {
    token?: string
    user?: AuthUser
-   safeUser?: AuthUser
    error?: string
    message?: string
 }

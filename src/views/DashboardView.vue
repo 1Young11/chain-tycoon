@@ -1,23 +1,18 @@
 <script setup lang="ts">
-import { ref } from 'vue'
 import { useGameStore } from '@/stores/game'
 
 const gameStore = useGameStore()
-const isWeeklyOpen = ref(false)
 </script>
 
 <template>
    <div class="dashboard">
-      <section class="urgent-banner">
-         <div class="urgent-banner__left">
-            <div class="urgent-banner__indicator"></div>
-            <span>{{ gameStore.urgentEvent.title }}</span>
-         </div>
-         <div class="urgent-banner__timer">{{ gameStore.urgentCountdown }}</div>
-         <button class="urgent-banner__btn" type="button">React Now <i class="fa-solid fa-arrow-right"></i></button>
-      </section>
-
       <div class="dashboard__body">
+         <section v-if="gameStore.isLoading" class="dashboard-state">Loading your company…</section>
+         <section v-else-if="gameStore.error" class="dashboard-state dashboard-state--error">
+            <span>{{ gameStore.error }}</span>
+            <button type="button" @click="gameStore.fetchGameState()">Try again</button>
+         </section>
+
          <section class="stats-row" aria-label="Dashboard statistics">
             <article class="stat-card">
                <span class="stat-card__label">Total Balance</span>
@@ -27,23 +22,22 @@ const isWeeklyOpen = ref(false)
             </article>
 
             <article class="stat-card">
-               <span class="stat-card__label">Today's PnL</span>
+               <span class="stat-card__label">Net Worth</span>
                <div class="stat-card__bottom">
-                  <span class="stat-card__value stat-card__value--profit">{{ gameStore.formattedTodayPnl }}</span>
-                  <span class="stat-card__meta">+{{ gameStore.todayPnlPercent }}%</span>
+                  <span class="stat-card__value stat-card__value--profit">{{ gameStore.formattedNetWorth }}</span>
                </div>
             </article>
 
             <article class="stat-card">
-               <span class="stat-card__label">Global Rank</span>
+               <span class="stat-card__label">Level</span>
                <div class="stat-card__bottom">
-                  <span class="stat-card__value">#{{ gameStore.globalRank }}</span>
-                  <span class="stat-card__meta stat-card__meta--warning"><i class="fa-solid fa-crown"></i></span>
+                  <span class="stat-card__value">{{ gameStore.level }}</span>
+                  <span class="stat-card__meta">{{ gameStore.xp }} XP</span>
                </div>
             </article>
 
             <article class="stat-card">
-               <span class="stat-card__label">Passive Income</span>
+               <span class="stat-card__label">Net Income</span>
                <div class="stat-card__bottom">
                   <span class="stat-card__value stat-card__value--profit">{{ gameStore.formattedPassiveIncome }}</span>
                   <span class="stat-card__meta stat-card__meta--warning"><i class="fa-solid fa-bolt"></i></span>
@@ -51,80 +45,23 @@ const isWeeklyOpen = ref(false)
             </article>
          </section>
 
-         <section class="activity-section">
+         <section class="activity-section locations-section">
             <div class="section-header">
                <div class="section-header__left">
-                  <h2 class="section-header__title">Today's Activity</h2>
-                  <span class="section-header__badge">{{ gameStore.todayActivities.length }} events</span>
-               </div>
-               <span class="section-header__date">July 15, 2026</span>
-            </div>
-
-            <div class="activity-grid">
-               <div v-for="(column, index) in gameStore.activityColumns" :key="index" class="activity-column">
-                  <article
-                     v-for="activity in column"
-                     :key="activity.id"
-                     class="timeline-entry"
-                     :class="`timeline-entry--${activity.tone}`"
-                  >
-                     <div class="timeline-entry__left">
-                        <span class="timeline-entry__time">{{ activity.time }}</span>
-                        <div class="timeline-entry__icon-box">
-                           <i class="fa-solid" :class="activity.icon"></i>
-                        </div>
-                        <div class="timeline-entry__info">
-                           <span class="timeline-entry__title">{{ activity.title }}</span>
-                           <span class="timeline-entry__desc">{{ activity.description }}</span>
-                        </div>
-                     </div>
-                     <span class="timeline-entry__value" :class="`timeline-entry__value--${activity.valueTone}`">
-                        {{ activity.value }}
-                     </span>
-                  </article>
+                  <h2 class="section-header__title">Locations</h2>
+                  <span class="section-header__badge">{{ gameStore.locations.length }} locations</span>
                </div>
             </div>
-         </section>
-
-         <section class="collapsed-block" :class="{ 'collapsed-block--open': isWeeklyOpen }">
-            <button class="collapsed-block__trigger" type="button" @click="isWeeklyOpen = !isWeeklyOpen">
-               <span class="collapsed-block__title">
-                  <i class="fa-solid fa-clock-rotate-left"></i>
-                  Earlier this week
-               </span>
-               <i class="fa-solid fa-chevron-down collapsed-block__arrow"></i>
-            </button>
-
-            <div v-if="isWeeklyOpen" class="collapsed-block__content">
-               <div class="collapsed-block__stats">
-                  <div v-for="metric in gameStore.weeklySummary" :key="metric.label" class="summary-metric">
-                     <span class="summary-metric__label">{{ metric.label }}</span>
-                     <span class="summary-metric__value" :class="metric.tone ? `summary-metric__value--${metric.tone}` : ''">
-                        {{ metric.value }}
-                     </span>
+            <div class="locations-grid">
+               <article v-for="location in gameStore.locations" :key="location.id" class="location-card" :class="{ 'location-card--locked': !location.isOwned }">
+                  <div>
+                     <h3>{{ location.name }}</h3>
+                     <p v-if="location.isOwned">{{ location.usedSlots }} / {{ location.slotCapacity }} slots</p>
+                     <p v-if="location.isOwned">{{ location.powerUsageKw }} / {{ location.powerCapacityKw }} kW</p>
+                     <p v-else>Unlocks at level {{ location.requiredLevel }}</p>
                   </div>
-               </div>
-
-               <div class="mini-chart">
-                  <div class="mini-chart__bars">
-                     <div
-                        v-for="bar in gameStore.weeklyChart"
-                        :key="bar.label"
-                        class="mini-chart__col"
-                        :class="{ 'mini-chart__col--active': bar.active }"
-                     >
-                        <div v-if="bar.active" class="mini-chart__dot"></div>
-                        <div class="mini-chart__bar-container">
-                           <div
-                              class="mini-chart__bar"
-                              :class="bar.tone ? `mini-chart__bar--${bar.tone}` : ''"
-                              :style="{ height: `${bar.height}px` }"
-                           ></div>
-                        </div>
-                        <span class="mini-chart__label">{{ bar.label }}</span>
-                     </div>
-                  </div>
-               </div>
+                  <span>{{ location.isOwned ? 'Owned' : 'Locked' }}</span>
+               </article>
             </div>
          </section>
       </div>
@@ -134,6 +71,58 @@ const isWeeklyOpen = ref(false)
 <style scoped lang="scss">
 .dashboard {
    min-width: 0;
+}
+
+.dashboard-state {
+   display: flex;
+   align-items: center;
+   justify-content: space-between;
+   gap: var(--space-4);
+   padding: var(--space-4);
+   border: 1px solid var(--color-border);
+   border-radius: var(--radius-sm);
+   background: var(--color-bg-tertiary);
+   color: var(--color-text-secondary);
+
+   &--error {
+      border-color: rgba(255, 83, 112, 0.35);
+      color: var(--color-loss);
+   }
+
+   button {
+      padding: var(--space-2) var(--space-3);
+      border: 1px solid var(--color-border);
+      border-radius: var(--radius-sm);
+      background: rgba(255, 255, 255, 0.04);
+      color: var(--color-text-primary);
+      cursor: pointer;
+   }
+}
+
+.locations-grid {
+   display: grid;
+   grid-template-columns: repeat(2, minmax(0, 1fr));
+   gap: var(--space-3);
+}
+
+.location-card {
+   display: flex;
+   align-items: flex-start;
+   justify-content: space-between;
+   gap: var(--space-4);
+   padding: var(--space-4);
+   border: 1px solid var(--color-border);
+   border-radius: var(--radius-sm);
+   background: var(--color-bg-tertiary);
+
+   h3 { margin-bottom: var(--space-2); color: var(--color-text-primary); font-size: var(--text-sm); }
+   p { color: var(--color-text-muted); font-size: var(--text-xs); line-height: 1.6; }
+   > span { color: var(--color-profit); font-size: var(--text-xs); font-weight: var(--font-semibold); }
+
+   &--locked {
+      opacity: 0.72;
+      > span { color: var(--color-text-muted); }
+   }
 }
 
 .urgent-banner {
@@ -651,6 +640,7 @@ const isWeeklyOpen = ref(false)
 }
 
 @include md {
+   .locations-grid { grid-template-columns: 1fr; }
    .urgent-banner {
       height: auto;
       flex-wrap: wrap;

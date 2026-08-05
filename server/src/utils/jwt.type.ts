@@ -4,7 +4,6 @@
 // }
 
 export interface Payload {
-   userId: string;
-   name: string;
-   balance: number;
+   sub: string;
+   email: string;
 }

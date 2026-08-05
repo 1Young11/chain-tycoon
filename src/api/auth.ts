@@ -1,23 +1,13 @@
 import type { AuthResponse, LoginRequest, RawAuthResponse, RegisterRequest } from '@/types/auth'
-
-const API_URL = import.meta.env.VITE_API_URL ?? 'http://localhost:3000'
+import { apiRequest } from './client'
 
 const requestAuth = async (path: string, body: LoginRequest | RegisterRequest): Promise<AuthResponse> => {
-   const response = await fetch(`${API_URL}${path}`, {
+   const data = await apiRequest<RawAuthResponse>(path, {
       method: 'POST',
-      headers: {
-         'Content-Type': 'application/json',
-      },
       body: JSON.stringify(body),
    })
 
-   const data = (await response.json()) as RawAuthResponse
-
-   if (!response.ok) {
-      throw new Error(data.error ?? data.message ?? 'Authentication request failed')
-   }
-
-   const user = data.user ?? data.safeUser
+   const user = data.user
 
    if (!data.token || !user) {
       throw new Error('Invalid authentication response')

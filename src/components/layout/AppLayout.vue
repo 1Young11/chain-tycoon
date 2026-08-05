@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed, onBeforeUnmount, onMounted } from 'vue'
+import { computed, onMounted } from 'vue'
 import { useRoute } from 'vue-router'
 import AppSidebar from './AppSidebar.vue'
 import { useGameStore } from '@/stores/game'
@@ -10,11 +10,7 @@ const gameStore = useGameStore()
 const pageTitle = computed(() => (route.meta.title as string | undefined) ?? 'Dashboard')
 
 onMounted(() => {
-   gameStore.startTicker()
-})
-
-onBeforeUnmount(() => {
-   gameStore.stopTicker()
+   gameStore.fetchGameState()
 })
 </script>
 
