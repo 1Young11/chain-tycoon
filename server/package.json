@@ -6,7 +6,7 @@
     "node": "24.x"
   },
   "scripts": {
-    "test": "node --test --require ts-node/register test/app.smoke.test.ts",
+    "test": "node --test --require ts-node/register test/*.test.ts",
     "dev": "nodemon --watch src --ext ts --exec ts-node src/index.ts",
     "typecheck": "tsc --noEmit --incremental false",
     "build": "tsc",

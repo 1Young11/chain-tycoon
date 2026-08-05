@@ -1,6 +1,12 @@
 import { defineStore } from 'pinia'
 import { computed, ref } from 'vue'
-import { login as loginRequest, register as registerRequest } from '@/api/auth'
+import {
+   getCurrentUser,
+   login as loginRequest,
+   logout as logoutRequest,
+   register as registerRequest,
+} from '@/api/auth'
+import { ApiError } from '@/api/client'
 import type { AuthUser } from '@/types/auth'
 
 const AUTH_TOKEN_KEY = 'chain-tycoon-token'
@@ -8,43 +14,47 @@ const AUTH_USER_KEY = 'chain-tycoon-user'
 
 export const useAuthStore = defineStore('auth', () => {
    const user = ref<AuthUser | null>(null)
-   const token = ref<string | null>(null)
    const loading = ref(false)
    const error = ref('')
+   const isInitialized = ref(false)
+   let initializationRequest: Promise<void> | null = null
 
-   const isAuthenticated = computed(() => Boolean(token.value && user.value))
+   const isAuthenticated = computed(() => Boolean(user.value))
 
-   const setSession = (nextToken: string, nextUser: AuthUser) => {
-      token.value = nextToken
+   const setSession = (nextUser: AuthUser) => {
       user.value = nextUser
-
-      localStorage.setItem(AUTH_TOKEN_KEY, nextToken)
-      localStorage.setItem(AUTH_USER_KEY, JSON.stringify(nextUser))
    }
 
    const clearSession = () => {
-      token.value = null
       user.value = null
+   }
 
+   const removeLegacyStorage = () => {
       localStorage.removeItem(AUTH_TOKEN_KEY)
       localStorage.removeItem(AUTH_USER_KEY)
    }
 
-   const initAuth = () => {
-      const savedToken = localStorage.getItem(AUTH_TOKEN_KEY)
-      const savedUser = localStorage.getItem(AUTH_USER_KEY)
+   const initAuth = (): Promise<void> => {
+      if (isInitialized.value) return Promise.resolve()
+      if (initializationRequest) return initializationRequest
 
-      if (!savedToken || !savedUser) {
-         clearSession()
-         return
-      }
+      removeLegacyStorage()
+      initializationRequest = (async () => {
+         try {
+            const response = await getCurrentUser()
+            setSession(response.user)
+         } catch (reason) {
+            clearSession()
+            if (!(reason instanceof ApiError && reason.status === 401)) {
+               error.value = reason instanceof Error ? reason.message : 'Unable to restore session'
+            }
+         } finally {
+            isInitialized.value = true
+            initializationRequest = null
+         }
+      })()
 
-      try {
-         token.value = savedToken
-         user.value = JSON.parse(savedUser) as AuthUser
-      } catch {
-         clearSession()
-      }
+      return initializationRequest
    }
 
    const login = async (email: string, password: string) => {
@@ -53,10 +63,10 @@ export const useAuthStore = defineStore('auth', () => {
 
       try {
          const response = await loginRequest({ email, password })
-         setSession(response.token, response.user)
+         setSession(response.user)
          return true
-      } catch (err) {
-         error.value = err instanceof Error ? err.message : 'Login failed'
+      } catch (reason) {
+         error.value = reason instanceof Error ? reason.message : 'Login failed'
          return false
       } finally {
          loading.value = false
@@ -69,24 +79,29 @@ export const useAuthStore = defineStore('auth', () => {
 
       try {
          const response = await registerRequest({ username, email, password })
-         setSession(response.token, response.user)
+         setSession(response.user)
          return true
-      } catch (err) {
-         error.value = err instanceof Error ? err.message : 'Registration failed'
+      } catch (reason) {
+         error.value = reason instanceof Error ? reason.message : 'Registration failed'
          return false
       } finally {
          loading.value = false
       }
    }
 
-   const logout = () => {
+   const logout = async () => {
       clearSession()
+      try {
+         await logoutRequest()
+      } catch (reason) {
+         error.value = reason instanceof Error ? reason.message : 'Logout failed'
+      }
    }
 
    return {
       isAuthenticated,
+      isInitialized,
       user,
-      token,
       loading,
       error,
       login,

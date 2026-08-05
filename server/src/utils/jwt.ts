@@ -1,5 +1,7 @@
-import jwt from 'jsonwebtoken';
-import type { Payload } from './jwt.type';
+import jwt from 'jsonwebtoken'
+import type { Payload } from './jwt.type'
+
+export const SESSION_TTL_SECONDS = 60 * 60
 
 const getJwtSecret = () => {
    const secret = process.env.JWT_SECRET
@@ -8,14 +10,14 @@ const getJwtSecret = () => {
 }
 
 export const generateToken = (user: Payload): string => {
-   const token = jwt.sign(user, getJwtSecret(), { expiresIn: '1h' });
-   return token;
-} 
+   return jwt.sign({ sub: user.sub }, getJwtSecret(), { expiresIn: SESSION_TTL_SECONDS })
+}
 
 export const verifyToken = (token: string): Payload | null => {
    try {
-      const isValidUser = jwt.verify(token, getJwtSecret());
-      return isValidUser as Payload
+      const payload = jwt.verify(token, getJwtSecret())
+      if (typeof payload !== 'object' || typeof payload.sub !== 'string' || !payload.sub) return null
+      return { sub: payload.sub }
    } catch {
       return null
    }

@@ -1,14 +1,10 @@
 import bcrypt from 'bcryptjs'
 import { pool } from '../../db/connection'
-import { generateToken } from '../../utils/jwt'
 import { initializeGameState } from '../game/game.service'
 
-type SafeUser = { id: string; username: string; email: string }
+export type SafeUser = { id: string; username: string; email: string }
 
-const createSession = (user: SafeUser) => ({
-   token: generateToken({ sub: String(user.id), email: user.email }),
-   user: { ...user, id: String(user.id) },
-})
+const normalizeUser = (user: SafeUser): SafeUser => ({ ...user, id: String(user.id) })
 
 export async function register(username: string, email: string, password: string) {
    const client = await pool.connect()
@@ -22,7 +18,7 @@ export async function register(username: string, email: string, password: string
       const user = result.rows[0]
       await initializeGameState(client, String(user.id))
       await client.query('COMMIT')
-      return createSession(user)
+      return normalizeUser(user)
    } catch (error) {
       await client.query('ROLLBACK')
       throw error
@@ -44,5 +40,13 @@ export async function login(email: string, password: string) {
    const isValid = await bcrypt.compare(password, user.password)
    if (!isValid) throw new Error('Invalid password')
 
-   return createSession({ id: user.id, username: user.username, email: user.email })
+   return normalizeUser({ id: user.id, username: user.username, email: user.email })
+}
+
+export async function getUserById(userId: string): Promise<SafeUser | null> {
+   const result = await pool.query<SafeUser>(
+      'SELECT id, username, email FROM users WHERE id = $1',
+      [userId],
+   )
+   return result.rows[0] ? normalizeUser(result.rows[0]) : null
 }
