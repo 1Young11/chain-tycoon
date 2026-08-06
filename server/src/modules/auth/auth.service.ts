@@ -1,6 +1,9 @@
 import bcrypt from 'bcryptjs'
 import { pool } from '../../db/connection'
-import { initializeGameState } from '../game/game.service'
+import { initializeNonFinancialGameState } from '../game/game.service'
+import { createOpeningBalance } from '../ledger'
+import { createUsdWallet } from '../wallet'
+import { parseCash } from '../../utils/money'
 
 export type SafeUser = { id: string; username: string; email: string }
 
@@ -16,7 +19,16 @@ export async function register(username: string, email: string, password: string
          [username, email, hashedPassword],
       )
       const user = result.rows[0]
-      await initializeGameState(client, String(user.id))
+      const userId = String(user.id)
+      const wallet = await createUsdWallet(client, userId)
+      await createOpeningBalance(client, {
+         userId,
+         walletId: wallet.id,
+         amount: parseCash('10000.00'),
+         idempotencyKey: 'opening-balance:v1',
+         source: 'REGISTRATION',
+      })
+      await initializeNonFinancialGameState(client, userId)
       await client.query('COMMIT')
       return normalizeUser(user)
    } catch (error) {

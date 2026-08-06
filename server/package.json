@@ -6,7 +6,8 @@
     "node": "24.x"
   },
   "scripts": {
-    "test": "node --test --require ts-node/register test/*.test.ts",
+    "test": "node --test --require ts-node/register test/app.smoke.test.ts test/auth.security.test.ts test/cash.test.ts test/ledger.test.ts test/wallet.test.ts test/game.mapper.test.ts",
+    "test:integration": "node --test --test-concurrency=1 --require ts-node/register test/ledger.integration.test.ts",
     "dev": "nodemon --watch src --ext ts --exec ts-node src/index.ts",
     "typecheck": "tsc --noEmit --incremental false",
     "build": "tsc",

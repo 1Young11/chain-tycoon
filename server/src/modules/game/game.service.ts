@@ -2,9 +2,9 @@ import type { PoolClient } from 'pg'
 import { pool } from '../../db/connection'
 import { LOCATION_TEMPLATES } from './location.templates'
 import { mapGameState } from './game.mapper'
+import { getUsdWallet } from '../wallet'
 
-export async function initializeGameState(client: PoolClient, userId: string) {
-   await client.query(`INSERT INTO wallets (user_id, currency, balance) VALUES ($1, 'USD', 10000) ON CONFLICT (user_id, currency) DO NOTHING`, [userId])
+export async function initializeNonFinancialGameState(client: PoolClient, userId: string) {
    await client.query(`INSERT INTO player_progress (user_id, level, xp, total_xp) VALUES ($1, 1, 0, 0) ON CONFLICT (user_id) DO NOTHING`, [userId])
 
    for (const location of LOCATION_TEMPLATES) {
@@ -22,14 +22,15 @@ export async function getGameState(userId: string) {
       await client.query('BEGIN')
       const userResult = await client.query('SELECT id, email FROM users WHERE id = $1 FOR UPDATE', [userId])
       if (!userResult.rowCount) throw new Error('User not found')
-      await initializeGameState(client, userId)
-      const [wallet, progress, locations] = await Promise.all([
-         client.query(`SELECT currency, balance FROM wallets WHERE user_id = $1 AND currency = 'USD'`, [userId]),
+      await initializeNonFinancialGameState(client, userId)
+      const wallet = await getUsdWallet(client, userId)
+      if (!wallet) throw new Error('Wallet data integrity check failed')
+      const [progress, locations] = await Promise.all([
          client.query('SELECT level, xp, total_xp FROM player_progress WHERE user_id = $1', [userId]),
          client.query('SELECT * FROM user_locations WHERE user_id = $1 ORDER BY required_level', [userId]),
       ])
       await client.query('COMMIT')
-      return mapGameState(userResult.rows[0], wallet.rows[0], progress.rows[0], locations.rows)
+      return mapGameState(userResult.rows[0], wallet, progress.rows[0], locations.rows)
    } catch (error) {
       await client.query('ROLLBACK')
       throw error
