@@ -1,5 +1,4 @@
 import { defineStore } from 'pinia'
-import { computed, ref } from 'vue'
 import {
    getCurrentUser,
    login as loginRequest,
@@ -11,102 +10,103 @@ import type { AuthUser } from './auth.types'
 
 const AUTH_TOKEN_KEY = 'chain-tycoon-token'
 const AUTH_USER_KEY = 'chain-tycoon-user'
+let initializationRequest: Promise<void> | null = null
 
-export const useAuthStore = defineStore('auth', () => {
-   const user = ref<AuthUser | null>(null)
-   const loading = ref(false)
-   const error = ref('')
-   const isInitialized = ref(false)
-   let initializationRequest: Promise<void> | null = null
+interface AuthState {
+   user: AuthUser | null
+   loading: boolean
+   error: string
+   isInitialized: boolean
+}
 
-   const isAuthenticated = computed(() => Boolean(user.value))
+const removeLegacyStorage = () => {
+   localStorage.removeItem(AUTH_TOKEN_KEY)
+   localStorage.removeItem(AUTH_USER_KEY)
+}
 
-   const setSession = (nextUser: AuthUser) => {
-      user.value = nextUser
-   }
+export const useAuthStore = defineStore('auth', {
+   state: (): AuthState => ({
+      user: null,
+      loading: false,
+      error: '',
+      isInitialized: false,
+   }),
 
-   const clearSession = () => {
-      user.value = null
-   }
+   getters: {
+      isAuthenticated: (state) => Boolean(state.user),
+   },
 
-   const removeLegacyStorage = () => {
-      localStorage.removeItem(AUTH_TOKEN_KEY)
-      localStorage.removeItem(AUTH_USER_KEY)
-   }
+   actions: {
+      setSession(nextUser: AuthUser) {
+         this.user = nextUser
+      },
 
-   const initAuth = (): Promise<void> => {
-      if (isInitialized.value) return Promise.resolve()
-      if (initializationRequest) return initializationRequest
+      clearSession() {
+         this.user = null
+      },
 
-      removeLegacyStorage()
-      initializationRequest = (async () => {
-         try {
-            const response = await getCurrentUser()
-            setSession(response.user)
-         } catch (reason) {
-            clearSession()
-            if (!(reason instanceof ApiError && reason.status === 401)) {
-               error.value = reason instanceof Error ? reason.message : 'Unable to restore session'
+      initAuth(): Promise<void> {
+         if (this.isInitialized) return Promise.resolve()
+         if (initializationRequest) return initializationRequest
+
+         removeLegacyStorage()
+         initializationRequest = (async () => {
+            try {
+               const response = await getCurrentUser()
+               this.setSession(response.user)
+            } catch (reason) {
+               this.clearSession()
+               if (!(reason instanceof ApiError && reason.status === 401)) {
+                  this.error = reason instanceof Error ? reason.message : 'Unable to restore session'
+               }
+            } finally {
+               this.isInitialized = true
+               initializationRequest = null
             }
+         })()
+
+         return initializationRequest
+      },
+
+      async login(email: string, password: string) {
+         this.error = ''
+         this.loading = true
+
+         try {
+            const response = await loginRequest({ email, password })
+            this.setSession(response.user)
+            return true
+         } catch (reason) {
+            this.error = reason instanceof Error ? reason.message : 'Login failed'
+            return false
          } finally {
-            isInitialized.value = true
-            initializationRequest = null
+            this.loading = false
          }
-      })()
+      },
 
-      return initializationRequest
-   }
+      async register(username: string, email: string, password: string) {
+         this.error = ''
+         this.loading = true
 
-   const login = async (email: string, password: string) => {
-      error.value = ''
-      loading.value = true
+         try {
+            const response = await registerRequest({ username, email, password })
+            this.setSession(response.user)
+            return true
+         } catch (reason) {
+            this.error = reason instanceof Error ? reason.message : 'Registration failed'
+            return false
+         } finally {
+            this.loading = false
+         }
+      },
 
-      try {
-         const response = await loginRequest({ email, password })
-         setSession(response.user)
-         return true
-      } catch (reason) {
-         error.value = reason instanceof Error ? reason.message : 'Login failed'
-         return false
-      } finally {
-         loading.value = false
-      }
-   }
-
-   const register = async (username: string, email: string, password: string) => {
-      error.value = ''
-      loading.value = true
-
-      try {
-         const response = await registerRequest({ username, email, password })
-         setSession(response.user)
-         return true
-      } catch (reason) {
-         error.value = reason instanceof Error ? reason.message : 'Registration failed'
-         return false
-      } finally {
-         loading.value = false
-      }
-   }
-
-   const logout = async () => {
-      clearSession()
-      try {
-         await logoutRequest()
-      } catch (reason) {
-         error.value = reason instanceof Error ? reason.message : 'Logout failed'
-      }
-   }
-
-   return {
-      isAuthenticated,
-      isInitialized,
-      user,
-      loading,
-      error,
-      login,
-      register,
-      logout,
-      initAuth,
-   }
+      async logout() {
+         this.clearSession()
+         try {
+            await logoutRequest()
+         } catch (reason) {
+            this.error = reason instanceof Error ? reason.message : 'Logout failed'
+         }
+      },
+   },
 })
