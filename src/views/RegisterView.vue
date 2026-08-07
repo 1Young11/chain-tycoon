@@ -9,7 +9,7 @@ import IconLock from '@/components/ui/IconLock.vue'
 import IconUser from '@/components/ui/IconUser.vue'
 import { useAuthValidation } from '@/composables/useAuthValidation'
 import { useAuthStore } from '@/features/auth'
-import type { RegisterErrors, RegisterForm } from '@/types/auth'
+import type { RegisterErrors, RegisterForm } from '@/features/auth'
 
 const authStore = useAuthStore()
 const router = useRouter()

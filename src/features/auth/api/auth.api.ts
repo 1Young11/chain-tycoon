@@ -1,5 +1,5 @@
-import type { AuthResponse, LoginRequest, RegisterRequest } from '@/types/auth'
-import { apiRequest, clearCsrfToken } from './client'
+import { apiRequest, clearCsrfToken } from '@/shared/api/client'
+import type { AuthResponse, LoginRequest, RegisterRequest } from '../model/auth.types'
 
 const requestAuth = async (path: string, body: LoginRequest | RegisterRequest): Promise<AuthResponse> => {
    const data = await apiRequest<AuthResponse>(path, {

@@ -8,7 +8,7 @@ import IconEye from '@/components/ui/IconEye.vue'
 import IconLock from '@/components/ui/IconLock.vue'
 import { useAuthValidation } from '@/composables/useAuthValidation'
 import { useAuthStore } from '@/features/auth'
-import type { LoginErrors, LoginRequest } from '@/types/auth'
+import type { LoginErrors, LoginRequest } from '@/features/auth'
 
 const authStore = useAuthStore()
 const router = useRouter()

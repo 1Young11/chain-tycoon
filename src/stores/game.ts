@@ -1,6 +1,6 @@
 import { computed, ref } from 'vue'
 import { defineStore } from 'pinia'
-import { ApiError, apiRequest } from '@/api/client'
+import { ApiError, apiRequest } from '@/shared/api/client'
 import { useAuthStore } from '@/features/auth'
 import router from '@/router'
 import { formatUsd } from '@/utils/money'

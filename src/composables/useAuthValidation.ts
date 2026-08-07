@@ -1,4 +1,4 @@
-import type { LoginErrors, LoginRequest, RegisterErrors, RegisterForm } from '@/types/auth'
+import type { LoginErrors, LoginRequest, RegisterErrors, RegisterForm } from '@/features/auth'
 import { isEmpty, isValidEmail } from '@/utils/validators'
 
 export function useAuthValidation() {

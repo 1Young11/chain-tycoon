@@ -5,9 +5,9 @@ import {
    login as loginRequest,
    logout as logoutRequest,
    register as registerRequest,
-} from '@/api/auth'
-import { ApiError } from '@/api/client'
-import type { AuthUser } from '@/types/auth'
+} from '../api/auth.api'
+import { ApiError } from '@/shared/api/client'
+import type { AuthUser } from './auth.types'
 
 const AUTH_TOKEN_KEY = 'chain-tycoon-token'
 const AUTH_USER_KEY = 'chain-tycoon-user'
