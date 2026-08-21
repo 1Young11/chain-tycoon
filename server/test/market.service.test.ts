@@ -119,7 +119,7 @@ test('returning an outdated cache on Provider error', async () => {
          providerCalls += 1
          if (providerCalls === 2) {
             throw new Error('Provider unavailable')
-         } 
+         }
          return quotes
       },
    }
@@ -138,5 +138,23 @@ test('returning an outdated cache on Provider error', async () => {
 })
 
 test('propagates provider error when no cached quotes exist', async () => {
-   
+   let providerCalls = 0
+
+   const fakeProvider: MarketProvider = {
+      name: 'fake',
+
+      async fetchQuotes() {
+         providerCalls += 1
+         throw new Error('Provider unavailable')
+      },
+   }
+
+   const service = new MarketService(fakeProvider)
+
+   await assert.rejects(
+      () => service.getQuotes(),
+      /Provider unavailable/,
+   )
+
+   assert.equal(providerCalls, 1)
 })
