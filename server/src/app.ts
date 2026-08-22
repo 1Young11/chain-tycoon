@@ -3,6 +3,7 @@ import cors from 'cors';
 
 import authRouter from './modules/auth/auth.routes'
 import gameRouter from './modules/game/game.routes'
+import marketRouter from './modules/market/market.routes'
 import { cookiesMiddleware } from './middleware/cookies.middleware'
 import { requireCsrf } from './middleware/csrf.middleware'
 
@@ -20,6 +21,7 @@ app.use(cookiesMiddleware)
 app.use(requireCsrf)
 app.use('/auth', authRouter)
 app.use('/game', gameRouter)
+app.use('/market', marketRouter)
 // Health check
 app.get('/health', (_req, res) => {
   res.json({ status: 'ok' })
