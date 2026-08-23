@@ -11,7 +11,7 @@ const navItems = [
    { name: 'dashboard', label: 'Dashboard', icon: 'fa-chart-line' },
    { name: 'portfolio', label: 'Portfolio', icon: 'fa-wallet' },
    { name: 'mining-overview', label: 'Mining', icon: 'fa-microchip', pathPrefix: '/app/mining' },
-   { name: 'market', label: 'Market Events', icon: 'fa-bolt' },
+   { name: 'market', label: 'Market', icon: 'fa-bolt' },
    { name: 'leaderboard', label: 'Leaderboard', icon: 'fa-trophy' },
 ]
 

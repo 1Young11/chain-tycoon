@@ -77,7 +77,7 @@ export const routes: RouteRecordRaw[] = [
             path: 'market',
             name: 'market',
             component: () => import('@/views/MarketView.vue'),
-            meta: { title: 'Market Events' },
+            meta: { title: 'Market' },
          },
          {
             path: 'leaderboard',
