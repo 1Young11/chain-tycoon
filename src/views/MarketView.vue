@@ -1,5 +1,7 @@
 <script setup lang="ts">
 import { onMounted } from 'vue'
+import MarketSummary from '../features/market/components/MarketSummary.vue'
+import MarketQuotesTable from '../features/market/components/MarketQuotesTable.vue'
 import { useMarketStore } from '@/features/market'
 
 const marketStore = useMarketStore()
@@ -11,6 +13,8 @@ onMounted(async () => {
 
 <template>
    <div class="view">
+      <MarketSummary />
+      <MarketQuotesTable />
       <h1>MarketView</h1>
       <p v-if="!marketStore.hasQuotes && marketStore.loading">Loading market data.......</p>
       <p v-else-if="!marketStore.hasQuotes && marketStore.error">
