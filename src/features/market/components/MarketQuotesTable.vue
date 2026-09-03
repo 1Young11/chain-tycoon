@@ -77,6 +77,13 @@ const quoteRows = computed(() => {
    })
    return quotes
 })
+
+const emit = defineEmits<{
+   'select-quote': [quote: MarketQuote]
+}>()
+const handleSelect = (quote: MarketQuote) => {
+   emit('select-quote', quote)
+}
 </script>
 
 <template>
@@ -128,7 +135,7 @@ const quoteRows = computed(() => {
                <col class="market-quotes__column market-quotes__column--price" />
                <col class="market-quotes__column market-quotes__column--change" />
                <col class="market-quotes__column market-quotes__column--updated" />
-               <!-- <col class="market-quotes__column market-quotes__column--action" /> -->
+               <col class="market-quotes__column market-quotes__column--action" />
             </colgroup>
             <thead>
                <tr>
@@ -136,7 +143,7 @@ const quoteRows = computed(() => {
                   <th scope="col">Price</th>
                   <th scope="col">24h Change</th>
                   <th scope="col">Provider Updated</th>
-                  <!-- <th scope="col"><span class="sr-only">Details</span></th> -->
+                  <th scope="col"><span class="sr-only">Details</span></th>
                </tr>
             </thead>
             <tbody>
@@ -162,15 +169,18 @@ const quoteRows = computed(() => {
                      </span>
                   </td>
                   <td class="market-quotes__updated">{{ formatProviderUpdatedAt(row.quote.providerUpdatedAt) }}</td>
-                  <!-- <td class="market-quotes__action">
-                     <i class="market-quotes__chevron fa-solid fa-chevron-right" aria-hidden="true"></i>
-                  </td> -->
+                  <td class="market-quotes__action">
+                     <button type="button" :aria-label="`View details for ${row.quote.symbol}`"
+                        @click="handleSelect(row.quote)">
+                        <i class="market-quotes__chevron fa-solid fa-chevron-right" aria-hidden="true"></i>
+                     </button>
+                  </td>
                </tr>
                <tr v-if="marketStore.quotes.length === 0">
-                  <td class="market-quotes__empty" colspan="4">No market data available.</td>
+                  <td class="market-quotes__empty" colspan="5">No market data available.</td>
                </tr>
                <tr v-if="quoteRows.length === 0 && marketStore.quotes.length !== 0">
-                  <td class="market-quotes__empty" colspan="4">No assets match the selected filters.</td>
+                  <td class="market-quotes__empty" colspan="5">No assets match the selected filters.</td>
                </tr>
             </tbody>
          </table>
