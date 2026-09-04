@@ -102,8 +102,7 @@ const handleSelect = (quote: MarketQuote) => {
          <label class="market-quotes__search">
             <span class="sr-only">Search assets</span>
             <i class="market-quotes__search-icon fa-solid fa-magnifying-glass" aria-hidden="true"></i>
-            <input v-model="searchQuery" class="market-quotes__search-input" type="search"
-               placeholder="Search asset name or symbol..." />
+            <input v-model="searchQuery" class="market-quotes__search-input" type="search" placeholder="Search asset name or symbol..." />
          </label>
 
          <label class="market-quotes__sort-label">

@@ -25,11 +25,13 @@ onMounted(async () => {
 
 <template>
    <div class="market-view">
-      <div v-if="!selectedQuote" class="market-view__overview">
-         <MarketSummary />
-         <MarketQuotesTable @select-quote="handleQuoteSelect" />
-      </div>
-      <MarketAssetDetails @back="handleDetailsBack" :quote="selectedQuote" v-else />
+      <Transition name="market-content" mode="out-in">
+         <div v-if="!selectedQuote" class="market-view__overview" key="overview">
+            <MarketSummary />
+            <MarketQuotesTable @select-quote="handleQuoteSelect" />
+         </div>
+         <MarketAssetDetails @back="handleDetailsBack" :quote="selectedQuote" key="details" v-else />
+      </Transition>
    </div>
 </template>
 
@@ -48,6 +50,38 @@ onMounted(async () => {
 }
 
 @media (max-width: 640px) {
-   .market-view { padding: var(--space-4); }
+   .market-view {
+      padding: var(--space-4);
+   }
+}
+
+.market-content-enter-active {
+   transition:
+      opacity 220ms ease-out,
+      transform 220ms ease-out;
+}
+
+.market-content-leave-active {
+   transition:
+      opacity 160ms ease-in,
+      transform 160ms ease-in;
+}
+
+.market-content-enter-from {
+   opacity: 0;
+   transform: translateY(8px);
+}
+
+.market-content-leave-to {
+   opacity: 0;
+   transform: translateY(-4px);
+}
+
+@media (prefers-reduced-motion: reduce) {
+
+   .market-content-enter-active,
+   .market-content-leave-active {
+      transition: none;
+   }
 }
 </style>

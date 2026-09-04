@@ -1,18 +1,31 @@
 <script setup lang="ts">
-import type { MarketQuote } from '../model/market.types'
+import { computed } from 'vue'
 
-// const props = defineProps<{
-//    quote: MarketQuote
-// }>()
-defineProps<{
+import { useMarketStore } from '../model/market.store'
+import type { MarketQuote } from '../model/market.types'
+import { getAssetPresentation, getChangeDirection } from '../utils/market.presentation'
+import { formatUsdPrice, formatChangePercent, formatLastFetchedAt, formatProviderUpdatedAt } from '../utils/market.formatters'
+
+const marketStore = useMarketStore()
+
+const props = defineProps<{
    quote: MarketQuote
 }>()
 const emit = defineEmits<{
-   'back': []
+   back: []
 }>()
 
 const handleBackToMarket = () => {
    emit('back')
+}
+
+const assetPresentation = computed(() => {
+   return getAssetPresentation(props.quote.symbol)
+})
+
+const getChangeModifier = (className: string, quote: MarketQuote): string => {
+   const changeDirection = getChangeDirection(quote.change24hPercent)
+   return changeDirection !== null ? `${className}--${changeDirection}` : ''
 }
 </script>
 
@@ -27,47 +40,50 @@ const handleBackToMarket = () => {
 
       <header class="market-asset-details__asset-header">
          <div class="market-asset-details__identity">
-            <span class="market-asset-details__asset-icon" aria-hidden="true">₿</span>
+            <span
+               class="market-asset-details__asset-icon"
+               aria-hidden="true"
+               :style="{ background: assetPresentation.background, color: assetPresentation.foreground ?? '#FFFFFF' }"
+            >
+               {{ assetPresentation.glyph }}
+            </span>
             <div class="market-asset-details__titles">
                <h2 class="market-asset-details__name">
-                  Bitcoin
-                  <span class="market-asset-details__symbol">BTC</span>
+                  {{ assetPresentation.name }}
+                  <span class="market-asset-details__symbol">{{ props.quote.symbol }}</span>
                </h2>
-               <p class="market-asset-details__description">
-                  Explore Bitcoin’s virtual market price and historical movement.
-               </p>
+               <p class="market-asset-details__description">Explore {{ assetPresentation.name }}’s virtual market price and historical movement.</p>
             </div>
          </div>
 
          <div class="market-asset-details__price-summary">
             <div class="market-asset-details__price-row">
-               <strong class="market-asset-details__price text-mono">$64,280.50</strong>
-               <span class="market-asset-details__change market-asset-details__change--positive text-mono">
-                  +2.14%
+               <strong class="market-asset-details__price text-mono">{{ formatUsdPrice(props.quote.priceUsd) }}</strong>
+               <span class="market-asset-details__change text-mono" :class="getChangeModifier('market-asset-details__change', props.quote)">
+                  {{ formatChangePercent(props.quote.change24hPercent) }}
                </span>
             </div>
-            <span class="market-asset-details__price-caption">Bitcoin is up 2.14% over the last 24 hours.</span>
          </div>
       </header>
 
-      <section class="market-asset-details__summary" aria-label="Bitcoin quote summary">
+      <section class="market-asset-details__summary" :aria-label="`${assetPresentation.name} quote summary`">
          <article class="market-asset-details__summary-card">
             <span class="market-asset-details__summary-title">Current price</span>
-            <strong class="market-asset-details__summary-value text-mono">$64,280.50</strong>
+            <strong class="market-asset-details__summary-value text-mono">{{ formatUsdPrice(props.quote.priceUsd) }}</strong>
          </article>
          <article class="market-asset-details__summary-card">
             <span class="market-asset-details__summary-title">24h change</span>
-            <strong class="market-asset-details__summary-value market-asset-details__summary-value--positive text-mono">
-               +2.14%
+            <strong class="market-asset-details__summary-value text-mono" :class="getChangeModifier('market-asset-details__summary-value', props.quote)">
+               {{ formatChangePercent(props.quote.change24hPercent) }}
             </strong>
          </article>
          <article class="market-asset-details__summary-card">
             <span class="market-asset-details__summary-title">Provider updated</span>
-            <strong class="market-asset-details__summary-value text-mono">12 seconds ago</strong>
+            <strong class="market-asset-details__summary-value text-mono">{{ formatProviderUpdatedAt(props.quote.providerUpdatedAt) }}</strong>
          </article>
          <article class="market-asset-details__summary-card">
             <span class="market-asset-details__summary-title">Last sync</span>
-            <strong class="market-asset-details__summary-value text-mono">Just now</strong>
+            <strong class="market-asset-details__summary-value text-mono">{{ formatLastFetchedAt(marketStore.lastFetchedAt) }}</strong>
          </article>
       </section>
 
@@ -85,10 +101,7 @@ const handleBackToMarket = () => {
                <div class="market-asset-details__periods" aria-label="Price history period">
                   <button class="market-asset-details__period" type="button">24H</button>
                   <button class="market-asset-details__period" type="button">7D</button>
-                  <button class="market-asset-details__period market-asset-details__period--active" type="button"
-                     aria-pressed="true">
-                     30D
-                  </button>
+                  <button class="market-asset-details__period market-asset-details__period--active" type="button" aria-pressed="true">30D</button>
                   <button class="market-asset-details__period" type="button">1Y</button>
                   <button class="market-asset-details__period" type="button">ALL</button>
                </div>
@@ -100,8 +113,13 @@ const handleBackToMarket = () => {
                   <strong class="market-asset-details__tooltip-value text-mono">$64,280.50</strong>
                </div>
 
-               <svg class="market-asset-details__chart-svg" viewBox="0 0 800 320" preserveAspectRatio="none" role="img"
-                  aria-label="Demonstration of Bitcoin price growth over thirty days">
+               <svg
+                  class="market-asset-details__chart-svg"
+                  viewBox="0 0 800 320"
+                  preserveAspectRatio="none"
+                  role="img"
+                  aria-label="Demonstration of Bitcoin price growth over thirty days"
+               >
                   <defs>
                      <linearGradient id="market-details-gradient" x1="0" y1="0" x2="0" y2="1">
                         <stop offset="0%" stop-color="#6c63ff" stop-opacity="0.35" />
@@ -120,10 +138,14 @@ const handleBackToMarket = () => {
                      <text x="35" y="254" text-anchor="end">$56k</text>
                   </g>
 
-                  <path class="market-asset-details__chart-area"
-                     d="M 40,220 C 120,240 160,190 220,200 C 280,210 320,150 400,160 C 480,170 520,120 600,105 C 680,90 720,130 780,70 L 780,280 L 40,280 Z" />
-                  <path class="market-asset-details__chart-line"
-                     d="M 40,220 C 120,240 160,190 220,200 C 280,210 320,150 400,160 C 480,170 520,120 600,105 C 680,90 720,130 780,70" />
+                  <path
+                     class="market-asset-details__chart-area"
+                     d="M 40,220 C 120,240 160,190 220,200 C 280,210 320,150 400,160 C 480,170 520,120 600,105 C 680,90 720,130 780,70 L 780,280 L 40,280 Z"
+                  />
+                  <path
+                     class="market-asset-details__chart-line"
+                     d="M 40,220 C 120,240 160,190 220,200 C 280,210 320,150 400,160 C 480,170 520,120 600,105 C 680,90 720,130 780,70"
+                  />
 
                   <g class="market-asset-details__chart-axis">
                      <text x="50" y="305">26 Jul</text>
@@ -181,9 +203,7 @@ const handleBackToMarket = () => {
 
             <aside class="market-asset-details__note">
                <i class="market-asset-details__note-icon fa-regular fa-lightbulb" aria-hidden="true"></i>
-               <p>
-                  Price history shows how an asset changed over time. Past movement does not predict future results.
-               </p>
+               <p>Price history shows how an asset changed over time. Past movement does not predict future results.</p>
             </aside>
          </aside>
       </div>
@@ -196,8 +216,8 @@ const handleBackToMarket = () => {
             <div>
                <h3>How to read this chart</h3>
                <p>
-                  The horizontal axis shows time, while the vertical axis shows price. Hover or tap on any point along
-                  the curve to see the precise valuation at that specific moment.
+                  The horizontal axis shows time, while the vertical axis shows price. Hover or tap on any point along the curve to see the precise valuation at
+                  that specific moment.
                </p>
             </div>
          </article>
@@ -209,8 +229,8 @@ const handleBackToMarket = () => {
             <div>
                <h3>Virtual Market Data</h3>
                <p>
-                  All prices, balances, and portfolio values in Chain Tycoon are part of a virtual educational
-                  simulation designed for risk-free market learning.
+                  All prices, balances, and portfolio values in Chain Tycoon are part of a virtual educational simulation designed for risk-free market
+                  learning.
                </p>
             </div>
          </article>
@@ -289,8 +309,6 @@ const handleBackToMarket = () => {
       flex: 0 0 auto;
       place-items: center;
       border-radius: 50%;
-      background: #f7931a;
-      box-shadow: 0 0 20px rgba(247, 147, 26, 0.25);
       color: #fff;
       font-size: 26px;
       font-weight: 800;
@@ -351,19 +369,27 @@ const handleBackToMarket = () => {
       display: inline-flex;
       align-items: center;
       border-radius: 6px;
-      background: var(--color-profit-subtle);
-      color: var(--color-profit);
       font-weight: var(--font-bold);
    }
 
    &__change {
       padding: var(--space-1) 10px;
       font-size: var(--text-sm);
-   }
 
-   &__price-caption {
-      color: var(--color-text-secondary);
-      font-size: 13px;
+      &--positive {
+         background: var(--color-profit-subtle);
+         color: var(--color-profit);
+      }
+
+      &--negative {
+         background: var(--color-loss-subtle);
+         color: var(--color-loss);
+      }
+
+      &--neutral {
+         background: var(--color-bg-elevated);
+         color: var(--color-text-secondary);
+      }
    }
 
    &__summary {
@@ -401,6 +427,14 @@ const handleBackToMarket = () => {
 
       &--positive {
          color: var(--color-profit);
+      }
+
+      &--negative {
+         color: var(--color-loss);
+      }
+
+      &--neutral {
+         color: var(--color-text-secondary);
       }
    }
 
