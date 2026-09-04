@@ -77,9 +77,11 @@ const logout = async () => {
    z-index: var(--z-sticky);
 
    display: flex;
-   width: 220px;
+   width: var(--app-sidebar-width);
+   min-width: var(--app-sidebar-width);
+   max-width: var(--app-sidebar-width);
    height: 100vh;
-   flex: 0 0 220px;
+   flex: 0 0 var(--app-sidebar-width);
    flex-direction: column;
    padding: var(--space-6) var(--space-4);
 
@@ -121,7 +123,10 @@ const logout = async () => {
       color: var(--color-text-secondary);
       font-size: var(--text-sm);
       font-weight: var(--font-medium);
-      transition: all var(--duration-base) var(--ease-default);
+      transition:
+         border-color var(--duration-base) var(--ease-default),
+         background-color var(--duration-base) var(--ease-default),
+         color var(--duration-base) var(--ease-default);
 
       i {
          width: 18px;
@@ -135,8 +140,6 @@ const logout = async () => {
       }
 
       &--active {
-         padding-left: 10px;
-
          border-left-color: var(--color-accent);
          border-top-left-radius: 0;
          border-bottom-left-radius: 0;
@@ -225,11 +228,13 @@ const logout = async () => {
    }
 }
 
-@include md {
+@include lg {
    .sidebar {
       position: static;
 
       width: 100%;
+      min-width: 0;
+      max-width: none;
       height: auto;
       flex-basis: auto;
 

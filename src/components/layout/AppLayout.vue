@@ -50,13 +50,15 @@ onMounted(() => {
 
 <style scoped lang="scss">
 .app-wrapper {
+   --app-sidebar-width: 220px;
+
    position: relative;
 
    display: grid;
    width: 100%;
    max-width: 1440px;
    min-height: 100vh;
-   grid-template-columns: 220px minmax(0, 1fr);
+   grid-template-columns: var(--app-sidebar-width) minmax(0, 1fr);
    margin-inline: auto;
 
    &::before,
