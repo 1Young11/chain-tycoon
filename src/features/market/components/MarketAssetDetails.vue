@@ -1,7 +1,10 @@
 <script setup lang="ts">
 import type { MarketQuote } from '../model/market.types'
 
-const props = defineProps<{
+// const props = defineProps<{
+//    quote: MarketQuote
+// }>()
+defineProps<{
    quote: MarketQuote
 }>()
 const emit = defineEmits<{
