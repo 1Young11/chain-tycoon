@@ -19,7 +19,7 @@ const findQuoteByChange = (quotes: readonly MarketQuote[], direction: 'highest' 
 export const useMarketStore = defineStore('market', {
    state: (): MarketState => ({
       quotes: [],
-      loading: false,
+      loading: true,
       error: '',
       isStale: false,
       isInitialized: false

@@ -7,6 +7,11 @@ export interface AssetPresentation {
    foreground?: string
 }
 
+export interface DataStatusPresentation {
+   label: string
+   modifier: 'fresh' | 'cached'
+}
+
 const assetPresentations: Readonly<Partial<Record<string, Readonly<AssetPresentation>>>> = {
    BTC: { name: 'Bitcoin', glyph: '₿', background: '#f7931a' },
    ETH: { name: 'Ethereum', glyph: 'Ξ', background: '#627eea' },
@@ -29,4 +34,8 @@ export const getChangeDirection = (percent: string | null): ChangeDirection => {
    if (percentValue > 0) return 'positive'
    if (percentValue < 0) return 'negative'
    return 'neutral'
+}
+
+export const getDataStatusPresentation = (isStale: boolean): Readonly<DataStatusPresentation> => {
+   return isStale ? { label: 'Cached', modifier: 'cached' } : { label: 'Fresh', modifier: 'fresh' }
 }

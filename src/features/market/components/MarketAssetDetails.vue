@@ -3,11 +3,10 @@ import { computed } from 'vue'
 
 import { useMarketStore } from '../model/market.store'
 import type { MarketQuote } from '../model/market.types'
-import { getAssetPresentation, getChangeDirection } from '../utils/market.presentation'
-import { formatUsdPrice, formatChangePercent, formatLastFetchedAt, formatProviderUpdatedAt } from '../utils/market.formatters'
+import { getAssetPresentation, getChangeDirection, getDataStatusPresentation } from '../utils/market.presentation'
+import { formatUsdPrice, formatChangePercent, formatLastFetchedAt, formatCompactRelativeTime } from '../utils/market.formatters'
 
 const marketStore = useMarketStore()
-
 const props = defineProps<{
    quote: MarketQuote
 }>()
@@ -18,11 +17,12 @@ const emit = defineEmits<{
 const handleBackToMarket = () => {
    emit('back')
 }
-
 const assetPresentation = computed(() => {
    return getAssetPresentation(props.quote.symbol)
 })
-
+const dataStatusPresentation = computed(() => {
+   return getDataStatusPresentation(marketStore.isStale)
+})
 const getChangeModifier = (className: string, quote: MarketQuote): string => {
    const changeDirection = getChangeDirection(quote.change24hPercent)
    return changeDirection !== null ? `${className}--${changeDirection}` : ''
@@ -79,7 +79,7 @@ const getChangeModifier = (className: string, quote: MarketQuote): string => {
          </article>
          <article class="market-asset-details__summary-card">
             <span class="market-asset-details__summary-title">Provider updated</span>
-            <strong class="market-asset-details__summary-value text-mono">{{ formatProviderUpdatedAt(props.quote.providerUpdatedAt) }}</strong>
+            <strong class="market-asset-details__summary-value text-mono">{{ formatCompactRelativeTime(props.quote.providerUpdatedAt) }}</strong>
          </article>
          <article class="market-asset-details__summary-card">
             <span class="market-asset-details__summary-title">Last sync</span>
@@ -93,7 +93,7 @@ const getChangeModifier = (className: string, quote: MarketQuote): string => {
                <div class="market-asset-details__chart-heading">
                   <h3 id="price-history-title" class="market-asset-details__chart-title">Price History</h3>
                   <div class="market-asset-details__period-stats">
-                     <strong class="market-asset-details__chart-price text-mono">$64,280.50</strong>
+                     <strong class="market-asset-details__chart-price text-mono">{{ formatUsdPrice(props.quote.priceUsd) }}</strong>
                      <span class="market-asset-details__period-change text-mono">+6.42% (30D)</span>
                   </div>
                </div>
@@ -110,7 +110,7 @@ const getChangeModifier = (className: string, quote: MarketQuote): string => {
             <div class="market-asset-details__chart">
                <div class="market-asset-details__tooltip" aria-hidden="true">
                   <span class="market-asset-details__tooltip-date">24 Aug 2026</span>
-                  <strong class="market-asset-details__tooltip-value text-mono">$64,280.50</strong>
+                  <strong class="market-asset-details__tooltip-value text-mono">{{ formatUsdPrice(props.quote.priceUsd) }}</strong>
                </div>
 
                <svg
@@ -184,19 +184,23 @@ const getChangeModifier = (className: string, quote: MarketQuote): string => {
                <dl class="market-asset-details__info-list">
                   <div class="market-asset-details__info-row">
                      <dt>First point</dt>
-                     <dd class="text-mono">$60,400.00</dd>
+                     <dd class="text-mono">—</dd>
                   </div>
                   <div class="market-asset-details__info-row">
                      <dt>Latest point</dt>
-                     <dd class="text-mono">$64,280.50</dd>
+                     <dd class="text-mono">{{ formatUsdPrice(props.quote.priceUsd) }}</dd>
                   </div>
                   <div class="market-asset-details__info-row">
                      <dt>Last fetched</dt>
-                     <dd>12s ago</dd>
+                     <dd>{{ formatCompactRelativeTime(props.quote.fetchedAt) }}</dd>
                   </div>
                   <div class="market-asset-details__info-row">
                      <dt>Data status</dt>
-                     <dd><span class="market-asset-details__fresh-status">Fresh</span></dd>
+                     <dd>
+                        <span class="market-asset-details__data-status" :class="`market-asset-details__data-status--${dataStatusPresentation.modifier}`">
+                           {{ dataStatusPresentation.label }}
+                        </span>
+                     </dd>
                   </div>
                </dl>
             </section>
@@ -650,13 +654,20 @@ const getChangeModifier = (className: string, quote: MarketQuote): string => {
       }
    }
 
-   &__fresh-status {
+   &__data-status {
       padding: 2px var(--space-2);
       border-radius: 4px;
-      background: var(--color-profit-subtle);
-      color: var(--color-profit);
       font-size: var(--text-xs);
       font-weight: var(--font-bold);
+
+      &--fresh {
+         background: var(--color-profit-subtle);
+         color: var(--color-profit);
+      }
+      &--cached {
+         background: var(--color-warning-subtle);
+         color: var(--color-warning);
+      }
    }
 
    &__note {

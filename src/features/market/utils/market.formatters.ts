@@ -50,7 +50,7 @@ export const formatLastFetchedAt = (fetchedAt: string | null): string => {
    return fetchedAtDateTimeFormatter.format(new Date(fetchedAtTimestamp))
 }
 
-export const formatProviderUpdatedAt = (providerUpdatedAt: string): string => {
+export const formatCompactRelativeTime = (providerUpdatedAt: string): string => {
    const currentTimestamp = Date.now()
    const providerUpdatedAtTimestamp = Date.parse(providerUpdatedAt)
 

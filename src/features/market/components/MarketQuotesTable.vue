@@ -2,7 +2,7 @@
 import { computed, ref } from 'vue'
 import { useMarketStore } from '../model/market.store'
 import type { MarketQuote } from '../model/market.types'
-import { formatChangePercent, formatProviderUpdatedAt, formatUsdPrice } from '../utils/market.formatters'
+import { formatChangePercent, formatCompactRelativeTime, formatUsdPrice } from '../utils/market.formatters'
 import { getAssetPresentation, getChangeDirection } from '../utils/market.presentation'
 
 const marketStore = useMarketStore()
@@ -167,7 +167,7 @@ const handleSelect = (quote: MarketQuote) => {
                         {{ formatChangePercent(row.quote.change24hPercent) }}
                      </span>
                   </td>
-                  <td class="market-quotes__updated">{{ formatProviderUpdatedAt(row.quote.providerUpdatedAt) }}</td>
+                  <td class="market-quotes__updated">{{ formatCompactRelativeTime(row.quote.providerUpdatedAt) }}</td>
                   <td class="market-quotes__action">
                      <button type="button" :aria-label="`View details for ${row.quote.symbol}`"
                         @click="handleSelect(row.quote)">
