@@ -20,6 +20,10 @@ const searchQuery = ref('')
 const selectedFilter = ref<MarketFilter>('all')
 const selectedSort = ref<MarketSort>('default')
 
+const props = defineProps<{
+   currentTimestamp: number
+}>()
+
 const getChangePercentage = (quote: MarketQuote): number | null => {
    return quote.change24hPercent === null ? null : Number(quote.change24hPercent)
 }
@@ -167,7 +171,7 @@ const handleSelect = (quote: MarketQuote) => {
                         {{ formatChangePercent(row.quote.change24hPercent) }}
                      </span>
                   </td>
-                  <td class="market-quotes__updated">{{ formatCompactRelativeTime(row.quote.providerUpdatedAt) }}</td>
+                  <td class="market-quotes__updated">{{ formatCompactRelativeTime(row.quote.providerUpdatedAt, props.currentTimestamp) }}</td>
                   <td class="market-quotes__action">
                      <button type="button" :aria-label="`View details for ${row.quote.symbol}`"
                         @click="handleSelect(row.quote)">

@@ -32,11 +32,10 @@ export const formatChangePercent = (change24hPercent: string | null): string => 
    return percentFormatter.format(Number(change24hPercent))
 }
 
-export const formatLastFetchedAt = (fetchedAt: string | null): string => {
+export const formatLastFetchedAt = (fetchedAt: string | null, currentTimestamp: number = Date.now()): string => {
    if (fetchedAt === null) return 'Never'
 
    const fetchedAtTimestamp = Date.parse(fetchedAt)
-   const currentTimestamp = Date.now()
 
    if (fetchedAtTimestamp > currentTimestamp) return 'Just now'
 
@@ -50,8 +49,7 @@ export const formatLastFetchedAt = (fetchedAt: string | null): string => {
    return fetchedAtDateTimeFormatter.format(new Date(fetchedAtTimestamp))
 }
 
-export const formatCompactRelativeTime = (providerUpdatedAt: string): string => {
-   const currentTimestamp = Date.now()
+export const formatCompactRelativeTime = (providerUpdatedAt: string, currentTimestamp: number = Date.now()): string => {
    const providerUpdatedAtTimestamp = Date.parse(providerUpdatedAt)
 
    if (providerUpdatedAtTimestamp > currentTimestamp) return 'Just now'

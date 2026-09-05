@@ -6,10 +6,12 @@ import MarketAssetDetails from '../features/market/components/MarketAssetDetails
 import MarketToolbar from '../features/market/components/MarketToolbar.vue'
 import { useMarketStore } from '@/features/market'
 import type { MarketQuote } from '../features/market/model/market.types'
+import { useCurrentTimestamp } from '../features/market/composables/useCurrentTimestamp'
 
 const marketStore = useMarketStore()
 
 const selectedQuote = ref<MarketQuote | null>(null)
+const currentTimestamp = useCurrentTimestamp()
 
 const handleQuoteSelect = (quote: MarketQuote) => {
    selectedQuote.value = quote
@@ -27,8 +29,16 @@ onMounted(async () => {
 <template>
    <div class="market-view">
       <Transition name="market-content" mode="out-in">
-         <div v-if="!selectedQuote && marketStore.loading && !marketStore.hasQuotes" class="market-view__initial-loading" key="initial-loading">
-            Loading market data...
+         <div
+            v-if="!selectedQuote && marketStore.loading && !marketStore.hasQuotes"
+            class="market-view__initial-loading"
+            key="initial-loading"
+            role="status"
+            aria-live="polite"
+            aria-atomic="true"
+         >
+            <span class="market-view__loading-indicator" aria-hidden="true"></span>
+            <span class="market-view__loading-text">Loading market data...</span>
          </div>
          <section
             class="market-view__error"
@@ -51,15 +61,15 @@ onMounted(async () => {
             <button class="market-view__retry-button" type="button" @click="marketStore.loadQuotes()">Refresh</button>
          </section>
          <div v-else-if="!selectedQuote && marketStore.hasQuotes" class="market-view__overview" key="overview">
-            <MarketToolbar />
+            <MarketToolbar :current-timestamp="currentTimestamp" />
             <div v-if="marketStore.error" class="market-view__refresh-error" role="alert" aria-atomic="true">
                <strong class="market-view__refresh-error-title">Unable to refresh market data.</strong>
                <span class="market-view__refresh-error-message">{{ marketStore.error }}</span>
             </div>
-            <MarketSummary />
-            <MarketQuotesTable @select-quote="handleQuoteSelect" />
+            <MarketSummary :current-timestamp="currentTimestamp" />
+            <MarketQuotesTable @select-quote="handleQuoteSelect" :current-timestamp="currentTimestamp" />
          </div>
-         <MarketAssetDetails @back="handleDetailsBack" :quote="selectedQuote" key="details" v-else-if="selectedQuote" />
+         <MarketAssetDetails @back="handleDetailsBack" :quote="selectedQuote" :current-timestamp="currentTimestamp" key="details" v-else-if="selectedQuote" />
       </Transition>
    </div>
 </template>
@@ -77,10 +87,7 @@ onMounted(async () => {
       gap: var(--space-6);
    }
 
-   &__initial-loading {
-      font-size: 22px;
-   }
-
+   &__initial-loading,
    &__error,
    &__empty {
       display: flex;
@@ -94,6 +101,21 @@ onMounted(async () => {
       border-radius: var(--radius-lg);
       background: var(--color-bg-secondary);
       text-align: center;
+   }
+
+   &__loading-indicator {
+      width: 32px;
+      height: 32px;
+      border: 3px solid var(--color-border);
+      border-top-color: var(--color-accent);
+      border-radius: 50%;
+      animation: market-loading-spin 800ms linear infinite;
+   }
+
+   &__loading-text {
+      color: var(--color-text-primary);
+      font-size: var(--text-xl);
+      font-weight: var(--font-semibold);
    }
 
    &__error-title,
@@ -156,6 +178,12 @@ onMounted(async () => {
    }
 }
 
+@keyframes market-loading-spin {
+   to {
+      transform: rotate(360deg);
+   }
+}
+
 @media (max-width: 640px) {
    .market-view {
       padding: var(--space-4);
@@ -189,6 +217,10 @@ onMounted(async () => {
 }
 
 @media (prefers-reduced-motion: reduce) {
+   .market-view__loading-indicator {
+      animation: none;
+   }
+
    .market-content-enter-active,
    .market-content-leave-active {
       transition: none;

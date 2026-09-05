@@ -3,6 +3,10 @@ import { useMarketStore } from '../model/market.store'
 import { formatChangePercent, formatLastFetchedAt } from '../utils/market.formatters'
 import { getChangeDirection } from '../utils/market.presentation'
 
+const props = defineProps<{
+   currentTimestamp: number
+}>()
+
 const marketStore = useMarketStore()
 </script>
 
@@ -39,7 +43,7 @@ const marketStore = useMarketStore()
          <span class="market-summary__title">Last sync</span>
          <div class="market-summary__value-group">
             <strong class="market-summary__value text-mono">
-               {{ formatLastFetchedAt(marketStore.lastFetchedAt) }}
+               {{ formatLastFetchedAt(marketStore.lastFetchedAt, props.currentTimestamp) }}
             </strong>
          </div>
       </li>

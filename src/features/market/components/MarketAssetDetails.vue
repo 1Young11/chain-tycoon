@@ -9,6 +9,7 @@ import { formatUsdPrice, formatChangePercent, formatLastFetchedAt, formatCompact
 const marketStore = useMarketStore()
 const props = defineProps<{
    quote: MarketQuote
+   currentTimestamp: number
 }>()
 const emit = defineEmits<{
    back: []
@@ -79,11 +80,11 @@ const getChangeModifier = (className: string, quote: MarketQuote): string => {
          </article>
          <article class="market-asset-details__summary-card">
             <span class="market-asset-details__summary-title">Provider updated</span>
-            <strong class="market-asset-details__summary-value text-mono">{{ formatCompactRelativeTime(props.quote.providerUpdatedAt) }}</strong>
+            <strong class="market-asset-details__summary-value text-mono">{{ formatCompactRelativeTime(props.quote.providerUpdatedAt, props.currentTimestamp) }}</strong>
          </article>
          <article class="market-asset-details__summary-card">
             <span class="market-asset-details__summary-title">Last sync</span>
-            <strong class="market-asset-details__summary-value text-mono">{{ formatLastFetchedAt(marketStore.lastFetchedAt) }}</strong>
+            <strong class="market-asset-details__summary-value text-mono">{{ formatLastFetchedAt(marketStore.lastFetchedAt, props.currentTimestamp) }}</strong>
          </article>
       </section>
 
@@ -192,7 +193,7 @@ const getChangeModifier = (className: string, quote: MarketQuote): string => {
                   </div>
                   <div class="market-asset-details__info-row">
                      <dt>Last fetched</dt>
-                     <dd>{{ formatCompactRelativeTime(props.quote.fetchedAt) }}</dd>
+                     <dd>{{ formatCompactRelativeTime(props.quote.fetchedAt, props.currentTimestamp) }}</dd>
                   </div>
                   <div class="market-asset-details__info-row">
                      <dt>Data status</dt>

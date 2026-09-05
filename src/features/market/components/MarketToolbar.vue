@@ -6,6 +6,11 @@ import { getDataStatusPresentation } from '../utils/market.presentation'
 import { formatLastFetchedAt } from '../utils/market.formatters'
 
 const marketStore = useMarketStore()
+
+const props = defineProps<{
+   currentTimestamp: number
+}>()
+
 const dataStatusPresentation = computed(() => {
    return getDataStatusPresentation(marketStore.isStale)
 })
@@ -17,7 +22,9 @@ const dataStatusPresentation = computed(() => {
          <span class="market-toolbar__status-dot" aria-hidden="true"></span>
          <span>{{ dataStatusPresentation.label }}</span>
       </div>
-      <div class="market-toolbar__updated">Last updated: <strong>{{ formatLastFetchedAt(marketStore.lastFetchedAt) }}</strong></div>
+      <div class="market-toolbar__updated">
+         Last updated: <strong>{{ formatLastFetchedAt(marketStore.lastFetchedAt, props.currentTimestamp) }}</strong>
+      </div>
       <button class="market-toolbar__refresh" type="button" @click="marketStore.loadQuotes()" :disabled="marketStore.loading">
          <svg
             class="market-toolbar__refresh-icon"
