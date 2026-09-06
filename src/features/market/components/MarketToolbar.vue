@@ -23,7 +23,7 @@ const dataStatusPresentation = computed(() => {
          <span>{{ dataStatusPresentation.label }}</span>
       </div>
       <div class="market-toolbar__updated">
-         Last updated: <strong>{{ formatLastFetchedAt(marketStore.lastFetchedAt, props.currentTimestamp) }}</strong>
+         Last sync: <strong>{{ formatLastFetchedAt(marketStore.lastFetchedAt, props.currentTimestamp) }}</strong>
       </div>
       <button class="market-toolbar__refresh" type="button" @click="marketStore.loadQuotes()" :disabled="marketStore.loading">
          <svg

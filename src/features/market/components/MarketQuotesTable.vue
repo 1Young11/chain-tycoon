@@ -118,7 +118,7 @@ const handleSelect = (quote: MarketQuote) => {
                <option value="price-asc">Price: Low to High</option>
                <option value="change-desc">24h Change: Gainers</option>
                <option value="change-asc">24h Change: Losers</option>
-               <option value="updated">Last Updated</option>
+               <option value="updated">Provider Updated</option>
             </select>
          </label>
 
