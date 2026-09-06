@@ -1,5 +1,6 @@
 <script setup lang="ts">
-import { onMounted, ref } from 'vue'
+import { onMounted, computed } from 'vue'
+import { useRoute, useRouter } from 'vue-router'
 import MarketSummary from '../features/market/components/MarketSummary.vue'
 import MarketQuotesTable from '../features/market/components/MarketQuotesTable.vue'
 import MarketAssetDetails from '../features/market/components/MarketAssetDetails.vue'
@@ -9,20 +10,49 @@ import type { MarketQuote } from '../features/market/model/market.types'
 import { useCurrentTimestamp } from '../features/market/composables/useCurrentTimestamp'
 
 const marketStore = useMarketStore()
+const route = useRoute()
+const router = useRouter()
 
-const selectedQuote = ref<MarketQuote | null>(null)
 const currentTimestamp = useCurrentTimestamp()
 
 const handleQuoteSelect = (quote: MarketQuote) => {
-   selectedQuote.value = quote
+   router.push({
+      name: 'market-asset-details',
+      params: {
+         symbol: quote.symbol,
+      },
+   })
 }
 
 const handleDetailsBack = () => {
-   selectedQuote.value = null
+   router.push({
+      name: 'market',
+   })
 }
 
 onMounted(async () => {
    await marketStore.loadQuotes()
+})
+
+const selectedSymbol = computed<string | null>(() => {
+   const currentRouteSymbol = route.params.symbol
+   if (typeof currentRouteSymbol === 'string') {
+      return currentRouteSymbol.toUpperCase()
+   }
+   return null
+})
+const selectedQuote = computed<MarketQuote | null>(() => {
+   if (selectedSymbol.value === null) {
+      return null
+   }
+   const matchedQuote = marketStore.quotes.find((quote) => quote.symbol === selectedSymbol.value)
+   if (matchedQuote === undefined) {
+      return null
+   }
+   return matchedQuote
+})
+const isUnknownAsset = computed<boolean>(() => {
+   return selectedSymbol.value !== null && marketStore.isInitialized && !marketStore.loading && marketStore.hasQuotes && selectedQuote.value === null
 })
 </script>
 
@@ -49,7 +79,7 @@ onMounted(async () => {
          >
             <h2 class="market-view__error-title">Unable to load market data</h2>
             <p class="market-view__error-message">{{ marketStore.error }}</p>
-            <button class="market-view__retry-button" type="button" @click="marketStore.loadQuotes()">Try again</button>
+            <button class="market-view__state-action" type="button" @click="marketStore.loadQuotes()">Try again</button>
          </section>
          <section
             v-else-if="!selectedQuote && marketStore.isInitialized && !marketStore.loading && !marketStore.hasQuotes && !marketStore.error"
@@ -58,7 +88,12 @@ onMounted(async () => {
             aria-labelledby="market-empty-title"
          >
             <h2 id="market-empty-title" class="market-view__empty-title">No market data available</h2>
-            <button class="market-view__retry-button" type="button" @click="marketStore.loadQuotes()">Refresh</button>
+            <button class="market-view__state-action" type="button" @click="marketStore.loadQuotes()">Refresh</button>
+         </section>
+         <section class="market-view__asset-not-found" key="asset-not-found" aria-labelledby="market-asset-not-found-title" v-else-if="isUnknownAsset">
+            <h2 id="market-asset-not-found-title" class="market-view__asset-not-found-title">Asset not found</h2>
+            <p class="market-view__asset-not-found-message">No market asset was found for the symbol {{ selectedSymbol }}.</p>
+            <button class="market-view__state-action" type="button" @click="handleDetailsBack">Back to Market</button>
          </section>
          <div v-else-if="!selectedQuote && marketStore.hasQuotes" class="market-view__overview" key="overview">
             <MarketToolbar :current-timestamp="currentTimestamp" />
@@ -89,7 +124,8 @@ onMounted(async () => {
 
    &__initial-loading,
    &__error,
-   &__empty {
+   &__empty,
+   &__asset-not-found {
       display: flex;
       min-height: 240px;
       align-items: center;
@@ -119,12 +155,14 @@ onMounted(async () => {
    }
 
    &__error-title,
-   &__empty-title {
+   &__empty-title,
+   &__asset-not-found-title {
       color: var(--color-text-primary);
       font-size: var(--text-xl);
    }
 
-   &__error-message {
+   &__error-message,
+   &__asset-not-found-message {
       max-width: 560px;
       color: var(--color-text-secondary);
       line-height: 1.5;
@@ -153,7 +191,7 @@ onMounted(async () => {
       overflow-wrap: anywhere;
    }
 
-   &__retry-button {
+   &__state-action {
       min-height: var(--control-height-md);
       margin-top: var(--space-2);
       padding: 0 var(--space-5);

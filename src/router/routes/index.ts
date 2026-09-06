@@ -80,6 +80,12 @@ export const routes: RouteRecordRaw[] = [
             meta: { title: 'Market' },
          },
          {
+            path: 'market/:symbol',
+            name: 'market-asset-details',
+            component: () => import('@/views/MarketView.vue'),
+            meta: { title: 'Market / Asset' },
+         },
+         {
             path: 'leaderboard',
             name: 'leaderboard',
             component: () => import('@/views/LeaderboardView.vue'),
