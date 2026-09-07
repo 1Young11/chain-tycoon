@@ -2,6 +2,8 @@ const API_URL = import.meta.env.VITE_API_URL ?? 'http://localhost:3000'
 const SAFE_METHODS = new Set(['GET', 'HEAD', 'OPTIONS'])
 let csrfToken: string | null = null
 let csrfRequest: Promise<string> | null = null
+type UnauthorizedHandler = () => void
+let unauthorizedHandler: UnauthorizedHandler | null = null
 
 interface ResponseBody {
    csrfToken?: string
@@ -59,6 +61,13 @@ async function handleResponse<T>(response: Response, method: string): Promise<T>
       return body as T
    }
 
+   if (response.status === 401) {
+      clearCsrfToken()
+      if (unauthorizedHandler !== null) {
+         unauthorizedHandler()
+      }
+   }
+
    if (response.status === 403 && !isSafeMethod(method)) {
       clearCsrfToken()
    }
@@ -109,4 +118,8 @@ export async function apiRequest<T>(path: string, init: RequestInit = {}): Promi
       headers,
    })
    return handleResponse<T>(response, method)
+}
+
+export function setUnauthorizedHandler(handler: UnauthorizedHandler): void {
+   unauthorizedHandler = handler
 }
