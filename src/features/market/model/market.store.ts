@@ -28,8 +28,14 @@ export const useMarketStore = defineStore('market', {
    getters: {
       hasQuotes: (state): boolean => state.quotes.length > 0,
 
-      topGainer: (state): MarketQuote | null => findQuoteByChange(state.quotes, 'highest'),
-      topLoser: (state): MarketQuote | null => findQuoteByChange(state.quotes, 'lowest'),
+      topGainer: (state): MarketQuote | null => {
+         const gainingQuotes = state.quotes.filter((quote) => quote.change24hPercent !== null && Number(quote.change24hPercent) > 0)
+         return findQuoteByChange(gainingQuotes, 'highest')
+      },
+      topLoser: (state): MarketQuote | null => {
+         const losingQuotes = state.quotes.filter((quote) => quote.change24hPercent !== null && Number(quote.change24hPercent) < 0)
+         return findQuoteByChange(losingQuotes, 'lowest')
+      },
 
       lastFetchedAt(state): string | null {
          return state.quotes.reduce<string | null>((selectedFetchedAt, quote) => {

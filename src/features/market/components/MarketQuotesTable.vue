@@ -43,9 +43,7 @@ const visibleQuotes = computed(() => {
          (selectedFilter.value === 'losers' && change !== null && change < 0)
       const asset = getAssetPresentation(quote.symbol)
       const matchesQuery =
-         normalizedQuery.length === 0 ||
-         quote.symbol.toLowerCase().includes(normalizedQuery) ||
-         asset.name.toLowerCase().includes(normalizedQuery)
+         normalizedQuery.length === 0 || quote.symbol.toLowerCase().includes(normalizedQuery) || asset.name.toLowerCase().includes(normalizedQuery)
 
       return matchesFilter && matchesQuery
    })
@@ -61,11 +59,9 @@ const visibleQuotes = computed(() => {
          case 'price-asc':
             return Number(left.priceUsd) - Number(right.priceUsd)
          case 'change-desc':
-            return (getChangePercentage(right) ?? Number.NEGATIVE_INFINITY) -
-               (getChangePercentage(left) ?? Number.NEGATIVE_INFINITY)
+            return (getChangePercentage(right) ?? Number.NEGATIVE_INFINITY) - (getChangePercentage(left) ?? Number.NEGATIVE_INFINITY)
          case 'change-asc':
-            return (getChangePercentage(left) ?? Number.POSITIVE_INFINITY) -
-               (getChangePercentage(right) ?? Number.POSITIVE_INFINITY)
+            return (getChangePercentage(left) ?? Number.POSITIVE_INFINITY) - (getChangePercentage(right) ?? Number.POSITIVE_INFINITY)
          case 'updated':
             return Date.parse(right.providerUpdatedAt) - Date.parse(left.providerUpdatedAt)
 
@@ -80,6 +76,22 @@ const quoteRows = computed(() => {
       return { quote: quote, presentation: getAssetPresentation(quote.symbol) }
    })
    return quotes
+})
+
+const emptyStateMessage = computed<string>(() => {
+   if (searchQuery.value.trim().length > 0) {
+      return 'No assets match your search.'
+   }
+
+   if (selectedFilter.value === 'gainers') {
+      return 'No gaining assets right now.'
+   }
+
+   if (selectedFilter.value === 'losers') {
+      return 'No losing assets right now.'
+   }
+
+   return 'No market assets available.'
 })
 
 const emit = defineEmits<{
@@ -116,16 +128,22 @@ const handleSelect = (quote: MarketQuote) => {
                <option value="name">Name</option>
                <option value="price-desc">Price: High to Low</option>
                <option value="price-asc">Price: Low to High</option>
-               <option value="change-desc">24h Change: Gainers</option>
-               <option value="change-asc">24h Change: Losers</option>
+               <option value="change-desc">24h Change: High to Low</option>
+               <option value="change-asc">24h Change: Low to High</option>
                <option value="updated">Provider Updated</option>
             </select>
          </label>
 
          <div class="market-quotes__filters" aria-label="Filter market assets">
-            <button v-for="filter in filters" :key="filter.value" class="market-quotes__filter"
-               :class="{ 'market-quotes__filter--active': selectedFilter === filter.value }" type="button"
-               :aria-pressed="selectedFilter === filter.value" @click="selectedFilter = filter.value">
+            <button
+               v-for="filter in filters"
+               :key="filter.value"
+               class="market-quotes__filter"
+               :class="{ 'market-quotes__filter--active': selectedFilter === filter.value }"
+               type="button"
+               :aria-pressed="selectedFilter === filter.value"
+               @click="selectedFilter = filter.value"
+            >
                {{ filter.label }}
             </button>
          </div>
@@ -153,10 +171,13 @@ const handleSelect = (quote: MarketQuote) => {
                <tr v-for="row in quoteRows" :key="row.quote.symbol" class="market-quotes__row">
                   <td>
                      <div class="market-quotes__asset">
-                        <span class="market-quotes__asset-icon" :style="{
-                           background: row.presentation.background,
-                           color: row.presentation.foreground ?? '#fff',
-                        }">
+                        <span
+                           class="market-quotes__asset-icon"
+                           :style="{
+                              background: row.presentation.background,
+                              color: row.presentation.foreground ?? '#fff',
+                           }"
+                        >
                            {{ row.presentation.glyph }}
                         </span>
                         <span class="market-quotes__asset-info">
@@ -173,17 +194,15 @@ const handleSelect = (quote: MarketQuote) => {
                   </td>
                   <td class="market-quotes__updated">{{ formatCompactRelativeTime(row.quote.providerUpdatedAt, props.currentTimestamp) }}</td>
                   <td class="market-quotes__action">
-                     <button type="button" :aria-label="`View details for ${row.quote.symbol}`"
-                        @click="handleSelect(row.quote)">
+                     <button type="button" :aria-label="`View details for ${row.quote.symbol}`" @click="handleSelect(row.quote)">
                         <i class="market-quotes__chevron fa-solid fa-chevron-right" aria-hidden="true"></i>
                      </button>
                   </td>
                </tr>
-               <tr v-if="marketStore.quotes.length === 0">
-                  <td class="market-quotes__empty" colspan="5">No market data available.</td>
-               </tr>
-               <tr v-if="quoteRows.length === 0 && marketStore.quotes.length !== 0">
-                  <td class="market-quotes__empty" colspan="5">No assets match the selected filters.</td>
+               <tr v-if="quoteRows.length === 0">
+                  <td class="market-quotes__empty" colspan="5">
+                     {{ emptyStateMessage }}
+                  </td>
                </tr>
             </tbody>
          </table>
@@ -276,7 +295,9 @@ const handleSelect = (quote: MarketQuote) => {
       font: inherit;
       font-size: var(--text-sm);
       outline: none;
-      transition: border-color var(--transition-base), box-shadow var(--transition-base);
+      transition:
+         border-color var(--transition-base),
+         box-shadow var(--transition-base);
 
       &:focus-visible {
          border-color: var(--color-accent);
@@ -316,7 +337,9 @@ const handleSelect = (quote: MarketQuote) => {
       color: var(--color-text-secondary);
       font-size: 13px;
       font-weight: var(--font-semibold);
-      transition: background-color var(--transition-base), color var(--transition-base);
+      transition:
+         background-color var(--transition-base),
+         color var(--transition-base);
 
       &:hover {
          color: var(--color-text-primary);
@@ -468,7 +491,9 @@ const handleSelect = (quote: MarketQuote) => {
    &__chevron {
       color: var(--color-text-secondary);
       font-size: var(--text-sm);
-      transition: color var(--transition-base), transform var(--transition-base);
+      transition:
+         color var(--transition-base),
+         transform var(--transition-base);
    }
 
    &__row:hover &__chevron {
