@@ -1,8 +1,16 @@
 import type { MarketProvider } from './market-provider'
-import type { MarketAsset, MarketQuote } from '../market.types'
+import type { MarketAsset, MarketQuote, MarketHistory, MarketHistoryPeriod, MarketHistoryPoint } from '../market.types'
 
 const COINGECKO_SIMPLE_PRICE_URL = 'https://api.coingecko.com/api/v3/simple/price'
 const COINGECKO_TIMEOUT_MS = 5_000
+const COINGECKO_COINS_URL = 'https://api.coingecko.com/api/v3/coins'
+
+const MARKET_HISTORY_DAYS_BY_PERIOD: Readonly<Record<MarketHistoryPeriod, number>> = {
+   '24h': 1,
+   '7d': 7,
+   '30d': 30,
+   '1y': 365,
+}
 
 const isRecord = (value: unknown): value is Record<string, unknown> => {
    return (typeof value === 'object' && value !== null && !Array.isArray(value))
@@ -95,5 +103,55 @@ export class CoinGeckoProvider implements MarketProvider {
       }
 
       return quotes
+   }
+
+   async fetchHistory(asset: Readonly<MarketAsset>, period: MarketHistoryPeriod): Promise<MarketHistory> {
+      const apiKey = getCoinGeckoApiKey()
+      const historyDays = MARKET_HISTORY_DAYS_BY_PERIOD[period].toString()
+
+      const params = new URLSearchParams()
+      params.set('vs_currency', 'usd')
+      params.set('days', historyDays)
+      params.set('precision', 'full')
+      const requestUrl = `${COINGECKO_COINS_URL}/${encodeURIComponent(asset.providerId)}/market_chart?${params.toString()}`
+      const response = await this.fetcher(requestUrl, {
+         headers: {
+            'x-cg-demo-api-key': apiKey,
+         },
+         signal: AbortSignal.timeout(COINGECKO_TIMEOUT_MS),
+      })
+      if (!response.ok) {
+         throw new Error(`CoinGecko history request failed ${response.status}`)
+      }
+      const body: unknown = await response.json()
+      if (!isRecord(body)) {
+         throw new Error('CoinGecko returned an invalid history response body')
+      }
+
+      const rawPrices = body.prices
+      if (!Array.isArray(rawPrices)) {
+         throw new Error('CoinGecko returned an invalid history prices array')
+      }
+
+      const points: MarketHistoryPoint[] = []
+      for (const rawPoint of rawPrices) {
+         if (!Array.isArray(rawPoint) || rawPoint.length !== 2) {
+            throw new Error('CoinGecko returned an invalid history point')
+         }
+         const rawTimestamp = rawPoint[0]
+         if (typeof rawTimestamp !== 'number' || !Number.isFinite(rawTimestamp) || rawTimestamp <= 0) {
+            throw new Error('CoinGecko returned an invalid history timestamp')
+         }
+         const rawPrice = rawPoint[1]
+         if (typeof rawPrice !== 'number' || !Number.isFinite(rawPrice) || rawPrice <= 0) {
+            throw new Error('CoinGecko returned an invalid history price')
+         }
+         points.push({
+            timestamp: rawTimestamp,
+            priceUsd: String(rawPrice)
+         })
+      }
+      const fetchedAt = new Date().toISOString()
+      return { symbol: asset.symbol, period: period, points: points, fetchedAt: fetchedAt }
    }
 }

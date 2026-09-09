@@ -85,6 +85,108 @@ test('normalizes a successful CoinGecko response', async (t) => {
    assert.equal(Number.isNaN(Date.parse(quote.fetchedAt)), false)
 })
 
+test('fetches and normalizes 7d price history', async (t) => {
+   const previousApiKey = process.env.COINGECKO_DEMO_API_KEY
+   process.env.COINGECKO_DEMO_API_KEY = 'test-api-key'
+
+   t.after(() => {
+      if (previousApiKey === undefined) {
+         delete process.env.COINGECKO_DEMO_API_KEY
+      } else {
+         process.env.COINGECKO_DEMO_API_KEY = previousApiKey
+      }
+   })
+
+   const fakeFetch: typeof fetch = async (input, init) => {
+      const requestUrl = new URL(String(input))
+      const headers = new Headers(init?.headers)
+      assert.equal(requestUrl.pathname, '/api/v3/coins/bitcoin/market_chart')
+      assert.equal(requestUrl.searchParams.get('vs_currency'), 'usd')
+      assert.equal(requestUrl.searchParams.get('days'), '7')
+      assert.equal(requestUrl.searchParams.get('precision'), 'full')
+      assert.equal(headers.get('x-cg-demo-api-key'), 'test-api-key')
+
+      return new Response(
+         JSON.stringify({
+            prices: [
+               [1_700_000_000_000, 100000.25],
+               [1_700_003_600_000, 100500.5],
+            ],
+         }),
+         {
+            status: 200,
+            headers: {
+               'Content-Type': 'application/json',
+            },
+         },
+      )
+   }
+
+   const provider = new CoinGeckoProvider(fakeFetch)
+   const asset = {
+      providerId: 'bitcoin',
+      symbol: 'BTC',
+      name: 'Bitcoin',
+      precision: 8,
+   }
+   const history = await provider.fetchHistory(asset, '7d')
+   assert.equal(history.symbol, 'BTC')
+   assert.equal(history.period, '7d')
+   assert.deepEqual(history.points, [
+      { timestamp: 1_700_000_000_000, priceUsd: '100000.25' },
+      { timestamp: 1_700_003_600_000, priceUsd: '100500.5' }
+   ])
+   assert.equal(Number.isNaN(Date.parse(history.fetchedAt)), false)
+})
+test('rejects history with an invalid price', async (t) => {
+   const previousApiKey = process.env.COINGECKO_DEMO_API_KEY
+   process.env.COINGECKO_DEMO_API_KEY = 'test-api-key'
+
+   t.after(() => {
+      if (previousApiKey === undefined) {
+         delete process.env.COINGECKO_DEMO_API_KEY
+      } else {
+         process.env.COINGECKO_DEMO_API_KEY = previousApiKey
+      }
+   })
+
+   const fakeFetch: typeof fetch = async (input, init) => {
+      const requestUrl = new URL(String(input))
+      const headers = new Headers(init?.headers)
+      assert.equal(requestUrl.pathname, '/api/v3/coins/bitcoin/market_chart')
+      assert.equal(requestUrl.searchParams.get('vs_currency'), 'usd')
+      assert.equal(requestUrl.searchParams.get('days'), '7')
+      assert.equal(requestUrl.searchParams.get('precision'), 'full')
+      assert.equal(headers.get('x-cg-demo-api-key'), 'test-api-key')
+
+      return new Response(
+         JSON.stringify({
+            prices: [
+               [1_700_000_000_000, -10],
+            ],
+         }),
+         {
+            status: 200,
+            headers: {
+               'Content-Type': 'application/json',
+            },
+         },
+      )
+   }
+
+   const provider = new CoinGeckoProvider(fakeFetch)
+   const asset = {
+      providerId: 'bitcoin',
+      symbol: 'BTC',
+      name: 'Bitcoin',
+      precision: 8,
+   }
+   await assert.rejects(
+      () => provider.fetchHistory(asset, '7d'),
+      /CoinGecko returned an invalid history price/
+   )
+})
+
 test('rejects an unsuccessful CoinGecko response', async (t) => {
    const previousApiKey = process.env.COINGECKO_DEMO_API_KEY
    process.env.COINGECKO_DEMO_API_KEY = 'test-api-key'

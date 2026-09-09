@@ -27,6 +27,9 @@ test('reuses fresh cached quotes without calling provider again', async () => {
          providerCalls += 1
          return quotes
       },
+      async fetchHistory() {
+         throw new Error('fetchHistory should not be called in quote tests')
+      },
    }
 
    const service = new MarketService(fakeProvider)
@@ -51,6 +54,9 @@ test('refreshes quotes after the cache expires', async () => {
       async fetchQuotes() {
          providerCalls += 1
          return quotes
+      },
+      async fetchHistory() {
+         throw new Error('fetchHistory should not be called in quote tests')
       },
    }
 
@@ -82,6 +88,9 @@ test('shares one provider request between concurrent calls', async () => {
       async fetchQuotes() {
          providerCalls += 1
          return pendingProviderRequest
+      },
+      async fetchHistory() {
+         throw new Error('fetchHistory should not be called in quote tests')
       },
    }
 
@@ -122,6 +131,9 @@ test('returning an outdated cache on Provider error', async () => {
          }
          return quotes
       },
+      async fetchHistory() {
+         throw new Error('fetchHistory should not be called in quote tests')
+      },
    }
 
    const service = new MarketService(fakeProvider, now)
@@ -146,6 +158,9 @@ test('propagates provider error when no cached quotes exist', async () => {
       async fetchQuotes() {
          providerCalls += 1
          throw new Error('Provider unavailable')
+      },
+      async fetchHistory() {
+         throw new Error('fetchHistory should not be called in quote tests')
       },
    }
 

@@ -104,7 +104,6 @@ const getChangeModifier = (className: string, quote: MarketQuote): string => {
                   <button class="market-asset-details__period" type="button">7D</button>
                   <button class="market-asset-details__period market-asset-details__period--active" type="button" aria-pressed="true">30D</button>
                   <button class="market-asset-details__period" type="button">1Y</button>
-                  <button class="market-asset-details__period" type="button">ALL</button>
                </div>
             </header>
 
