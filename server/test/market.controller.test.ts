@@ -38,6 +38,9 @@ test('returns market snapshot with status 200', async () => {
          counterServiceCalls += 1
          return testMarketSnapshot
       },
+      async getHistory() {
+         throw new Error('getHistory should not be called in quote tests')
+      },
    }
 
    const controller = createMarketController(fakeService);
@@ -68,6 +71,9 @@ test('returns status 503 when market service fails', async () => {
       async getQuotes() {
          counterServiceCalls += 1
          throw new Error('Provider unavailable')
+      },
+      async getHistory() {
+         throw new Error('getHistory should not be called in quote tests')
       },
    }
 

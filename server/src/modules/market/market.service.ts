@@ -12,6 +12,12 @@ interface MarketHistoryCacheEntry {
    expiresAt: number
 }
 
+export class MarketAssetNotFoundError extends Error {
+   constructor(symbol: string) {
+      super(`Market asset not found: ${symbol}`)
+   }
+}
+
 export class MarketService {
    private readonly provider: MarketProvider
    private readonly now: Clock
@@ -97,6 +103,20 @@ export class MarketService {
 
       this.historyRefreshRequests.set(cacheKey, refreshRequest)
       return refreshRequest
+   }
+
+   async getHistory(symbol: string, period: MarketHistoryPeriod): Promise<MarketHistorySnapshot> {
+      const capitalSymbol = symbol.toUpperCase().trim()
+      const matchedAsset = MARKET_ASSETS.find((asset) => asset.symbol === capitalSymbol)
+      if (matchedAsset === undefined) {
+         throw new MarketAssetNotFoundError(capitalSymbol)
+      }
+      const cacheKey = `${matchedAsset.symbol}:${period}`
+      const cachedHistory = this.getFreshCachedHistory(cacheKey)
+      if (cachedHistory === null) {
+         return this.refreshHistory(matchedAsset, period)
+      }
+      return { ...cachedHistory, isStale: false }
    }
 
    async getQuotes(): Promise<MarketSnapshot> {
