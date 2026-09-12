@@ -1,26 +1,168 @@
 <script setup lang="ts">
-import { computed, onMounted } from 'vue'
+import { computed, nextTick, onBeforeUnmount, onMounted, ref, watch } from 'vue'
 import { useRoute } from 'vue-router'
 import AppSidebar from './AppSidebar.vue'
 import { useGameStore } from '@/stores/game'
 
+const MOBILE_NAVIGATION_QUERY = '(max-width: 1024px)'
+
+interface SidebarControls {
+   focusCloseButton(): void
+   getFocusableElements(): HTMLElement[]
+   getSidebarElement(): HTMLElement | null
+}
+
 const route = useRoute()
 const gameStore = useGameStore()
+const isMobileViewport = ref(false)
+const isMobileMenuOpen = ref(false)
+const menuButtonElement = ref<HTMLButtonElement | null>(null)
+const sidebarComponent = ref<SidebarControls | null>(null)
+
+let viewportMediaQuery: MediaQueryList | null = null
+let previousBodyOverflow: string | null = null
 
 const pageTitle = computed(() => (route.meta.title as string | undefined) ?? 'Dashboard')
 
+const lockBodyScroll = () => {
+   if (previousBodyOverflow !== null) return
+
+   previousBodyOverflow = document.body.style.overflow
+   document.body.style.overflow = 'hidden'
+}
+
+const unlockBodyScroll = () => {
+   if (previousBodyOverflow === null) return
+
+   document.body.style.overflow = previousBodyOverflow
+   previousBodyOverflow = null
+}
+
+const openMobileMenu = async () => {
+   if (!isMobileViewport.value || isMobileMenuOpen.value) return
+
+   isMobileMenuOpen.value = true
+   lockBodyScroll()
+   await nextTick()
+   sidebarComponent.value?.focusCloseButton()
+}
+
+const setMobileMenuClosed = async (restoreFocus: boolean) => {
+   if (!isMobileMenuOpen.value) return
+
+   isMobileMenuOpen.value = false
+   unlockBodyScroll()
+
+   if (restoreFocus && isMobileViewport.value) {
+      await nextTick()
+      menuButtonElement.value?.focus()
+   }
+}
+
+const closeMobileMenu = () => setMobileMenuClosed(true)
+
+const handleViewportChange = (event: MediaQueryListEvent | MediaQueryList) => {
+   isMobileViewport.value = event.matches
+
+   if (!event.matches) {
+      void setMobileMenuClosed(false)
+   }
+}
+
+const handleDocumentKeydown = (event: KeyboardEvent) => {
+   if (!isMobileMenuOpen.value || !isMobileViewport.value) return
+
+   if (event.key === 'Escape') {
+      event.preventDefault()
+      void closeMobileMenu()
+      return
+   }
+
+   if (event.key !== 'Tab') return
+
+   const sidebarElement = sidebarComponent.value?.getSidebarElement()
+   const focusableElements = sidebarComponent.value?.getFocusableElements() ?? []
+
+   if (sidebarElement === null || sidebarElement === undefined || focusableElements.length === 0) {
+      event.preventDefault()
+      return
+   }
+
+   const firstElement = focusableElements[0]
+   const lastElement = focusableElements[focusableElements.length - 1]
+   const activeElement = document.activeElement
+   const focusIsOutsideSidebar = !(activeElement instanceof Node) || !sidebarElement.contains(activeElement)
+
+   if (event.shiftKey && (activeElement === firstElement || focusIsOutsideSidebar)) {
+      event.preventDefault()
+      lastElement?.focus()
+   } else if (!event.shiftKey && (activeElement === lastElement || focusIsOutsideSidebar)) {
+      event.preventDefault()
+      firstElement?.focus()
+   }
+}
+
 onMounted(() => {
    gameStore.fetchGameState()
+   viewportMediaQuery = window.matchMedia(MOBILE_NAVIGATION_QUERY)
+   handleViewportChange(viewportMediaQuery)
+   viewportMediaQuery.addEventListener('change', handleViewportChange)
+   document.addEventListener('keydown', handleDocumentKeydown)
+})
+
+watch(
+   () => route.fullPath,
+   () => {
+      if (isMobileMenuOpen.value) {
+         void closeMobileMenu()
+      }
+   },
+)
+
+onBeforeUnmount(() => {
+   viewportMediaQuery?.removeEventListener('change', handleViewportChange)
+   document.removeEventListener('keydown', handleDocumentKeydown)
+   isMobileMenuOpen.value = false
+   unlockBodyScroll()
 })
 </script>
 
 <template>
    <div class="app-wrapper">
-      <AppSidebar />
+      <AppSidebar
+         ref="sidebarComponent"
+         :is-mobile="isMobileViewport"
+         :is-open="isMobileMenuOpen"
+         @close="closeMobileMenu"
+         @navigate="closeMobileMenu"
+      />
 
-      <main class="main-panel">
+      <div
+         v-if="isMobileViewport"
+         class="mobile-navigation-backdrop"
+         :class="{ 'mobile-navigation-backdrop--visible': isMobileMenuOpen }"
+         aria-hidden="true"
+         @click="closeMobileMenu"
+      ></div>
+
+      <main class="main-panel" :inert="isMobileViewport && isMobileMenuOpen">
          <header class="topbar">
-            <div class="topbar__title">{{ pageTitle }}</div>
+            <div class="topbar__heading">
+               <button
+                  v-if="isMobileViewport"
+                  ref="menuButtonElement"
+                  class="topbar__menu-button"
+                  type="button"
+                  aria-label="Open navigation"
+                  :aria-expanded="isMobileMenuOpen"
+                  aria-controls="app-sidebar"
+                  @click="openMobileMenu"
+               >
+                  <i class="fa-solid fa-bars" aria-hidden="true"></i>
+               </button>
+
+               <div class="topbar__title">{{ pageTitle }}</div>
+            </div>
 
             <div class="topbar__badges">
                <div class="topbar__badge topbar__badge--accent topbar__badge--mono">
@@ -100,6 +242,29 @@ onMounted(() => {
    background: var(--color-bg-primary);
 }
 
+.mobile-navigation-backdrop {
+   position: fixed;
+   inset: 0;
+   z-index: var(--z-modal);
+
+   visibility: hidden;
+   background: rgba(0, 0, 0, 0.62);
+   opacity: 0;
+   pointer-events: none;
+   transition:
+      opacity 200ms ease-out,
+      visibility 0s linear 200ms;
+
+   &--visible {
+      visibility: visible;
+      opacity: 1;
+      pointer-events: auto;
+      transition:
+         opacity 200ms ease-out,
+         visibility 0s linear 0s;
+   }
+}
+
 .topbar {
    position: sticky;
    top: 0;
@@ -115,6 +280,37 @@ onMounted(() => {
    border-bottom: 1px solid var(--color-border);
    background: rgba(15, 15, 19, 0.8);
    backdrop-filter: blur(12px);
+
+   &__heading {
+      display: flex;
+      min-width: 0;
+      align-items: center;
+      gap: var(--space-3);
+   }
+
+   &__menu-button {
+      display: inline-flex;
+      width: var(--control-height-sm);
+      height: var(--control-height-sm);
+      flex: 0 0 auto;
+      align-items: center;
+      justify-content: center;
+      border: 1px solid var(--color-border);
+      border-radius: var(--radius-sm);
+      background: var(--color-bg-tertiary);
+      color: var(--color-text-primary);
+      cursor: pointer;
+
+      &:hover {
+         border-color: var(--color-accent);
+         color: var(--color-accent-hover);
+      }
+
+      &:focus-visible {
+         outline: var(--focus-ring);
+         outline-offset: var(--focus-offset);
+      }
+   }
 
    &__title {
       color: var(--color-text-primary);
@@ -199,6 +395,12 @@ onMounted(() => {
          width: 100%;
          flex-wrap: wrap;
       }
+   }
+}
+
+@media (prefers-reduced-motion: reduce) {
+   .mobile-navigation-backdrop {
+      transition: none;
    }
 }
 </style>
